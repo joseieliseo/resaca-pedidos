@@ -409,7 +409,7 @@
       </div>
       <div style="overflow-x:auto;">
         <table class="products-table" id="productsTable">
-          <thead><tr><th>Activo</th><th>Proveedor</th><th>Tipo</th><th>Marca</th><th>Descripción</th><th>Tamaño</th><th>Costo</th><th>Acciones</th></tr></thead>
+          <thead><tr><th>Activo</th><th>Proveedor</th><th>Tipo</th><th>Marca</th><th>Descripción</th><th>Tamaño</th><th>Unidad</th><th>Costo</th><th>Acciones</th></tr></thead>
           <tbody id="productsBody"></tbody>
         </table>
       </div>
@@ -427,11 +427,13 @@
     <div class="form-group"><label>Proveedor</label>
       <select id="mpProvider"><option value="Southern Glazer's">Southern Glazer's</option><option value="Breakthru">Breakthru</option><option value="Crest Beverage">Crest Beverage</option></select></div>
     <div class="form-group"><label>Tipo de Spirit</label>
-      <select id="mpType"><option>Mezcal</option><option>Rum</option><option>Tequila</option><option>Whiskey/Bourbon</option><option>Gin</option><option>Vodka</option><option>Liqueur</option><option>Vermouth</option><option>Wine</option><option>Water</option><option>Beer</option><option>Other</option></select></div>
+      <select id="mpType"><option>Beer</option><option>Mezcal</option><option>Rum</option><option>Tequila</option><option>Whiskey/Bourbon</option><option>Gin</option><option>Vodka</option><option>Liqueur</option><option>Vermouth</option><option>Wine</option><option>Mixer</option><option>Water</option><option>Other</option></select></div>
     <div class="form-group"><label>Marca</label><input type="text" id="mpBrand" placeholder="Ej: DON JULIO"></div>
     <div class="form-group"><label>Descripción</label><input type="text" id="mpDesc" placeholder="Ej: TEQUILA BLANCO"></div>
     <div class="form-group"><label>Presentación</label><input type="text" id="mpSize" placeholder="Ej: 750ML"></div>
-    <div class="form-group"><label>Costo Unitario ($)</label><input type="number" id="mpCost" placeholder="0.00" step="0.01" min="0"></div>
+    <div class="form-group"><label>Unidad de Compra</label>
+      <select id="mpUnit"><option value="Caja">Caja</option><option value="Botella">Botella</option><option value="Six-pack">Six-pack</option><option value="Pack">Pack</option><option value="Keg">Keg</option></select></div>
+    <div class="form-group"><label>Costo ($)</label><input type="number" id="mpCost" placeholder="0.00" step="0.01" min="0"></div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeProductModal()">Cancelar</button>
       <button class="btn-save" onclick="saveProduct()">Guardar</button>
@@ -462,66 +464,95 @@ const USERS = {
 };
 
 const DEFAULT_PRODUCTS = [
-  // Southern Glazer's
-  { id:1,  provider:"Southern Glazer's", type:'Tequila',         brand:'DON JULIO',      desc:'TEQUILA BLANCO',                         size:'750ML', cost:0, active:true },
-  { id:2,  provider:"Southern Glazer's", type:'Tequila',         brand:'DON JULIO',      desc:'TEQUILA REPOSADO',                       size:'750ML', cost:0, active:true },
-  { id:3,  provider:"Southern Glazer's", type:'Tequila',         brand:'DON JULIO',      desc:'TEQUILA ANEJO',                          size:'750ML', cost:0, active:true },
-  { id:4,  provider:"Southern Glazer's", type:'Tequila',         brand:'DON JULIO',      desc:'TEQUILA ANEJO 70TH ANNIVERSARY',         size:'750ML', cost:0, active:true },
-  { id:5,  provider:"Southern Glazer's", type:'Tequila',         brand:'PATRON',         desc:'TEQUILA SILVER',                         size:'750ML', cost:0, active:true },
-  { id:6,  provider:"Southern Glazer's", type:'Tequila',         brand:'GRAN MALO',      desc:'TAMARINDO TEQUILA LIQUEUR',              size:'750ML', cost:0, active:true },
-  { id:7,  provider:"Southern Glazer's", type:'Whiskey/Bourbon', brand:"BUCHANAN'S",     desc:'BLENDED SCOTCH DELUXE 12 YR',            size:'750ML', cost:0, active:true },
-  { id:8,  provider:"Southern Glazer's", type:'Whiskey/Bourbon', brand:"BUCHANAN'S",     desc:'SCOTCH WHISKEY PINEAPPLE',               size:'750ML', cost:0, active:true },
-  { id:9,  provider:"Southern Glazer's", type:'Whiskey/Bourbon', brand:'BUFFALO TRACE',  desc:'KENTUCKY STRAIGHT BOURBON',              size:'750ML', cost:0, active:true },
-  { id:10, provider:"Southern Glazer's", type:'Whiskey/Bourbon', brand:'BULLEIT',        desc:'STRAIGHT BOURBON FRONTIER WHISKEY 6 YR', size:'750ML', cost:0, active:true },
-  { id:11, provider:"Southern Glazer's", type:'Whiskey/Bourbon', brand:'JAMESON',        desc:'BLENDED IRISH WHISKEY',                  size:'750ML', cost:0, active:true },
-  { id:12, provider:"Southern Glazer's", type:'Whiskey/Bourbon', brand:'JOHNNIE WALKER', desc:'BLENDED SCOTCH BLACK LABEL 12 YR',       size:'750ML', cost:0, active:true },
-  { id:13, provider:"Southern Glazer's", type:'Whiskey/Bourbon', brand:"MACALLAN",       desc:'HIGHLAND SINGLE MALT 12 YR',             size:'750ML', cost:0, active:true },
-  { id:14, provider:"Southern Glazer's", type:'Whiskey/Bourbon', brand:"MAKER'S MARK",   desc:'STRAIGHT BOURBON',                       size:'750ML', cost:0, active:true },
-  { id:15, provider:"Southern Glazer's", type:'Whiskey/Bourbon', brand:'TEMPLETON',      desc:'RYE 4 YEARS',                            size:'750ML', cost:0, active:true },
-  { id:16, provider:"Southern Glazer's", type:'Rum',             brand:'BACARDI',        desc:'LIGHT RUM SUPERIOR',                     size:'1L',    cost:0, active:true },
-  { id:17, provider:"Southern Glazer's", type:'Gin',             brand:'MALFY',          desc:'ORIGINALE GIN ITALY',                    size:'750ML', cost:0, active:true },
-  { id:18, provider:"Southern Glazer's", type:'Gin',             brand:'TANQUERAY',      desc:'LONDON DRY GIN',                         size:'750ML', cost:0, active:true },
-  { id:19, provider:"Southern Glazer's", type:'Vodka',           brand:'STOLI',          desc:'BLUEBERRY FLAVORED VODKA',               size:'750ML', cost:0, active:true },
-  { id:20, provider:"Southern Glazer's", type:'Liqueur',         brand:'APEROL',         desc:'APERITIVO',                              size:'750ML', cost:0, active:true },
-  { id:21, provider:"Southern Glazer's", type:'Liqueur',         brand:'BAILEYS',        desc:'IRISH CREAM LIQUEUR THE ORIGINAL',       size:'750ML', cost:0, active:true },
-  { id:22, provider:"Southern Glazer's", type:'Liqueur',         brand:'GRAND MARNIER',  desc:'COGNAC & ORANGE LIQUEUR CORDON ROUGE',   size:'750ML', cost:0, active:true },
-  { id:23, provider:"Southern Glazer's", type:'Liqueur',         brand:'KAHLUA',         desc:'RUM & COFFEE LIQUEUR',                   size:'750ML', cost:0, active:true },
-  { id:24, provider:"Southern Glazer's", type:'Liqueur',         brand:'LICOR 43',       desc:'HERBAL LIQUEUR',                         size:'750ML', cost:0, active:true },
-  { id:25, provider:"Southern Glazer's", type:'Liqueur',         brand:'MIDORI',         desc:'MELON LIQUEUR',                          size:'750ML', cost:0, active:true },
-  { id:26, provider:"Southern Glazer's", type:'Vermouth',        brand:'MARTINI & ROSSI',desc:'EXTRA DRY VERMOUTH',                     size:'750ML', cost:0, active:true },
-  // Breakthru
-  { id:27, provider:'Breakthru', type:'Mezcal',          brand:'400 CONEJOS',    desc:'MEZCAL JOVEN',                  size:'750ML', cost:0, active:true },
-  { id:28, provider:'Breakthru', type:'Tequila',         brand:'1800',           desc:'TEQUILA SILVER',                size:'1L',    cost:0, active:true },
-  { id:29, provider:'Breakthru', type:'Tequila',         brand:'CONCIERE',       desc:'TEQUILA SILVER',                size:'1L',    cost:0, active:true },
-  { id:30, provider:'Breakthru', type:'Tequila',         brand:'MAESTRO DOBEL',  desc:'TEQUILA DIAMANTE',              size:'750ML', cost:0, active:true },
-  { id:31, provider:'Breakthru', type:'Rum',             brand:'CONCIERE',       desc:'RUM SILVER',                    size:'1L',    cost:0, active:true },
-  { id:32, provider:'Breakthru', type:'Rum',             brand:'PLANTERAY',      desc:'BARBADOS RUM AGED 5 YR',        size:'750ML', cost:0, active:true },
-  { id:33, provider:'Breakthru', type:'Gin',             brand:"HENDRICK'S",     desc:'GIN',                           size:'1L',    cost:0, active:true },
-  { id:34, provider:'Breakthru', type:'Whiskey/Bourbon', brand:'TULLAMORE D.E.W.',desc:'IRISH WHISKEY',                size:'750ML', cost:0, active:true },
-  { id:35, provider:'Breakthru', type:'Liqueur',         brand:'BOLS',           desc:'LIQUEUR MELON',                 size:'1L',    cost:0, active:true },
-  { id:36, provider:'Breakthru', type:'Liqueur',         brand:'BOLS',           desc:'LIQUEUR PEACH SCHNAPPS',        size:'1L',    cost:0, active:true },
-  { id:37, provider:'Breakthru', type:'Liqueur',         brand:'BOLS',           desc:'LIQUEUR POMEGRANATE',           size:'1L',    cost:0, active:true },
-  { id:38, provider:'Breakthru', type:'Liqueur',         brand:'BOLS',           desc:'LIQUEUR WATERMELON',            size:'1L',    cost:0, active:true },
-  { id:39, provider:'Breakthru', type:'Liqueur',         brand:'DISARONNO',      desc:'ORIGINALE AMARETTO',            size:'750ML', cost:0, active:true },
-  { id:40, provider:'Breakthru', type:'Liqueur',         brand:'TIA MARIA',      desc:'COFFEE LIQUEUR',                size:'1L',    cost:0, active:true },
-  { id:41, provider:'Breakthru', type:'Wine',            brand:'BAREFOOT',       desc:'CABERNET SAUVIGNON PET 6/4PK',  size:'187ML', cost:0, active:true },
-  { id:42, provider:'Breakthru', type:'Wine',            brand:'BAREFOOT',       desc:'CHARDONNAY PET 6/4PK',          size:'187ML', cost:0, active:true },
-  { id:43, provider:'Breakthru', type:'Wine',            brand:'BAREFOOT',       desc:'MERLOT PET 6/4PK',              size:'187ML', cost:0, active:true },
-  { id:44, provider:'Breakthru', type:'Wine',            brand:'CYT FRONTERA',   desc:'CHARDONNAY 6/4PK',              size:'187ML', cost:0, active:true },
-  { id:45, provider:'Breakthru', type:'Wine',            brand:'DAOU',           desc:'CABERNET SAUVIGNON',            size:'750ML', cost:0, active:true },
-  { id:46, provider:'Breakthru', type:'Wine',            brand:'STELLA ROSA',    desc:'BLACK',                         size:'750ML', cost:0, active:true },
-  { id:47, provider:'Breakthru', type:'Wine',            brand:'STELLA ROSA',    desc:"MOSCATO D'ASTI DOCG",           size:'750ML', cost:0, active:true },
-  { id:48, provider:'Breakthru', type:'Wine',            brand:'STELLA ROSA',    desc:'PEACH 12/2PK',                  size:'187ML', cost:0, active:true },
-  { id:49, provider:'Breakthru', type:'Wine',            brand:'STELLA ROSA',    desc:'ROSSO 12/2PK',                  size:'187ML', cost:0, active:true },
-  { id:50, provider:'Breakthru', type:'Water',           brand:'VOSS',           desc:'PURE WATER STILL',              size:'375ML', cost:0, active:true },
-  // Crest Beverage
-  { id:51, provider:'Crest Beverage', type:'Whiskey/Bourbon', brand:'FIREBALL',        desc:'CINNAMON WHISKY',               size:'750ML', cost:0, active:true },
-  { id:52, provider:'Crest Beverage', type:'Whiskey/Bourbon', brand:"JACK DANIEL'S",   desc:'OLD NO. 7 TENNESSEE WHISKEY',   size:'750ML', cost:0, active:true },
-  { id:53, provider:'Crest Beverage', type:'Whiskey/Bourbon', brand:'WOODFORD RESERVE',desc:'KENTUCKY STRAIGHT BOURBON',      size:'750ML', cost:0, active:true },
-  { id:54, provider:'Crest Beverage', type:'Vodka',           brand:"TITO'S",          desc:'HANDMADE VODKA',                size:'750ML', cost:0, active:true },
+  // ── Southern Glazer's ──────────────────────────────────────────────────────
+  { id:1, provider:'Southern Glazer's's', type:'Tequila',         brand:'DON JULIO',       desc:'TEQUILA BLANCO',                         size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:2, provider:'Southern Glazer's's', type:'Tequila',         brand:'DON JULIO',       desc:'TEQUILA REPOSADO',                       size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:3, provider:'Southern Glazer's's', type:'Tequila',         brand:'DON JULIO',       desc:'TEQUILA ANEJO',                          size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:4, provider:'Southern Glazer's's', type:'Tequila',         brand:'DON JULIO',       desc:'TEQUILA ANEJO 70TH ANNIVERSARY',         size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:5, provider:'Southern Glazer's's', type:'Tequila',         brand:'PATRON',          desc:'TEQUILA SILVER',                         size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:6, provider:'Southern Glazer's's', type:'Tequila',         brand:'GRAN MALO',       desc:'TAMARINDO TEQUILA LIQUEUR',              size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:7, provider:'Southern Glazer's's', type:'Whiskey/Bourbon', brand:"BUCHANAN'S",      desc:'BLENDED SCOTCH DELUXE 12 YR',            size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:8, provider:'Southern Glazer's's', type:'Whiskey/Bourbon', brand:"BUCHANAN'S",      desc:'SCOTCH WHISKEY PINEAPPLE',               size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:9, provider:'Southern Glazer's's', type:'Whiskey/Bourbon', brand:'BUFFALO TRACE',   desc:'KENTUCKY STRAIGHT BOURBON',              size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:10, provider:'Southern Glazer's's', type:'Whiskey/Bourbon', brand:'BULLEIT',         desc:'STRAIGHT BOURBON FRONTIER WHISKEY 6 YR', size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:11, provider:'Southern Glazer's's', type:'Whiskey/Bourbon', brand:'JAMESON',         desc:'BLENDED IRISH WHISKEY',                  size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:12, provider:'Southern Glazer's's', type:'Whiskey/Bourbon', brand:'JOHNNIE WALKER',  desc:'BLENDED SCOTCH BLACK LABEL 12 YR',       size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:13, provider:'Southern Glazer's's', type:'Whiskey/Bourbon', brand:'MACALLAN',        desc:'HIGHLAND SINGLE MALT 12 YR',             size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:14, provider:'Southern Glazer's's', type:'Whiskey/Bourbon', brand:"MAKER'S MARK",    desc:'STRAIGHT BOURBON',                       size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:15, provider:'Southern Glazer's's', type:'Whiskey/Bourbon', brand:'TEMPLETON',       desc:'RYE 4 YEARS',                            size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:16, provider:'Southern Glazer's's', type:'Rum',             brand:'BACARDI',         desc:'LIGHT RUM SUPERIOR',                     size:'1L',    unit:'Botella', cost:0, active:true },
+  { id:17, provider:'Southern Glazer's's', type:'Gin',             brand:'MALFY',           desc:'ORIGINALE GIN ITALY',                    size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:18, provider:'Southern Glazer's's', type:'Gin',             brand:'TANQUERAY',       desc:'LONDON DRY GIN',                         size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:19, provider:'Southern Glazer's's', type:'Vodka',           brand:'STOLI',           desc:'BLUEBERRY FLAVORED VODKA',               size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:20, provider:'Southern Glazer's's', type:'Liqueur',         brand:'APEROL',          desc:'APERITIVO',                              size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:21, provider:'Southern Glazer's's', type:'Liqueur',         brand:'BAILEYS',         desc:'IRISH CREAM LIQUEUR THE ORIGINAL',       size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:22, provider:'Southern Glazer's's', type:'Liqueur',         brand:'GRAND MARNIER',   desc:'COGNAC & ORANGE LIQUEUR CORDON ROUGE',   size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:23, provider:'Southern Glazer's's', type:'Liqueur',         brand:'KAHLUA',          desc:'RUM & COFFEE LIQUEUR',                   size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:24, provider:'Southern Glazer's's', type:'Liqueur',         brand:'LICOR 43',        desc:'HERBAL LIQUEUR',                         size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:25, provider:'Southern Glazer's's', type:'Liqueur',         brand:'MIDORI',          desc:'MELON LIQUEUR',                          size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:26, provider:'Southern Glazer's's', type:'Vermouth',        brand:'MARTINI & ROSSI', desc:'EXTRA DRY VERMOUTH',                     size:'750ML', unit:'Botella', cost:0, active:true },
+  // ── Breakthru ──────────────────────────────────────────────────────────────
+  { id:27, provider:'Breakthru', type:'Mezcal',          brand:'400 CONEJOS',    desc:'MEZCAL JOVEN',                  size:'750ML', unit:'Caja/6', cost:0, active:true },
+  { id:28, provider:'Breakthru', type:'Tequila',         brand:'1800',           desc:'TEQUILA SILVER',                size:'1L',    unit:'Caja/12', cost:0, active:true },
+  { id:29, provider:'Breakthru', type:'Tequila',         brand:'CONCIERE',       desc:'TEQUILA SILVER',                size:'1L',    unit:'Caja/12', cost:0, active:true },
+  { id:30, provider:'Breakthru', type:'Tequila',         brand:'MAESTRO DOBEL',  desc:'TEQUILA DIAMANTE',              size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:31, provider:'Breakthru', type:'Rum',             brand:'CONCIERE',       desc:'RUM SILVER',                    size:'1L',    unit:'Caja/12', cost:0, active:true },
+  { id:32, provider:'Breakthru', type:'Rum',             brand:'PLANTERAY',      desc:'BARBADOS RUM AGED 5 YR',        size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:33, provider:'Breakthru', type:'Whiskey/Bourbon', brand:'TULLAMORE D.E.W.',desc:'IRISH WHISKEY',                size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:34, provider:'Breakthru', type:'Liqueur',         brand:'BOLS',           desc:'LIQUEUR MELON',                 size:'1L',    unit:'Botella', cost:0, active:true },
+  { id:35, provider:'Breakthru', type:'Liqueur',         brand:'BOLS',           desc:'LIQUEUR PEACH SCHNAPPS',        size:'1L',    unit:'Botella', cost:0, active:true },
+  { id:36, provider:'Breakthru', type:'Liqueur',         brand:'BOLS',           desc:'LIQUEUR POMEGRANATE',           size:'1L',    unit:'Botella', cost:0, active:true },
+  { id:37, provider:'Breakthru', type:'Liqueur',         brand:'BOLS',           desc:'LIQUEUR WATERMELON',            size:'1L',    unit:'Botella', cost:0, active:true },
+  { id:38, provider:'Breakthru', type:'Liqueur',         brand:'DISARONNO',      desc:'ORIGINALE AMARETTO',            size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:39, provider:'Breakthru', type:'Liqueur',         brand:'TIA MARIA',      desc:'COFFEE LIQUEUR',                size:'1L',    unit:'Botella', cost:0, active:true },
+  { id:40, provider:'Breakthru', type:'Wine',            brand:'BAREFOOT',       desc:'CABERNET SAUVIGNON PET 6/4PK',  size:'187ML', unit:'Caja/24', cost:0, active:true },
+  { id:41, provider:'Breakthru', type:'Wine',            brand:'BAREFOOT',       desc:'CHARDONNAY PET 6/4PK',          size:'187ML', unit:'Caja/24', cost:0, active:true },
+  { id:42, provider:'Breakthru', type:'Wine',            brand:'BAREFOOT',       desc:'MERLOT PET 6/4PK',              size:'187ML', unit:'Caja/24', cost:0, active:true },
+  { id:43, provider:'Breakthru', type:'Wine',            brand:'CYT FRONTERA',   desc:'CHARDONNAY 6/4PK',              size:'187ML', unit:'Caja/24', cost:0, active:true },
+  { id:44, provider:'Breakthru', type:'Wine',            brand:'DAOU',           desc:'CABERNET SAUVIGNON',            size:'750ML', unit:'Caja/12', cost:0, active:true },
+  { id:45, provider:'Breakthru', type:'Wine',            brand:'STELLA ROSA',    desc:'BLACK',                         size:'750ML', unit:'Caja/12', cost:0, active:true },
+  { id:46, provider:'Breakthru', type:'Wine',            brand:'STELLA ROSA',    desc:"MOSCATO D'ASTI DOCG",           size:'750ML', unit:'Caja/12', cost:0, active:true },
+  { id:47, provider:'Breakthru', type:'Wine',            brand:'STELLA ROSA',    desc:'PEACH 12/2PK',                  size:'187ML', unit:'Caja/24', cost:0, active:true },
+  { id:48, provider:'Breakthru', type:'Wine',            brand:'STELLA ROSA',    desc:'ROSSO 12/2PK',                  size:'187ML', unit:'Caja/24', cost:0, active:true },
+  { id:49, provider:'Breakthru', type:'Water',           brand:'VOSS',           desc:'PURE WATER STILL',              size:'375ML', unit:'Caja/24', cost:0, active:true },
+  // ── Crest Beverage ─────────────────────────────────────────────────────────
+  // Beer
+  { id:50, provider:'Crest Beverage', type:'Beer', brand:'CORONA',        desc:'EXTRA B24 12OZ',       size:'12OZ', unit:'Caja', cost:26.95, active:true },
+  { id:51, provider:'Crest Beverage', type:'Beer', brand:'CORONA NA',     desc:'B24 12OZ 6P',          size:'12OZ', unit:'Caja', cost:30.50, active:true },
+  { id:52, provider:'Crest Beverage', type:'Beer', brand:'PACIFICO',      desc:'B24 12OZ',             size:'12OZ', unit:'Caja', cost:25.60, active:true },
+  { id:53, provider:'Crest Beverage', type:'Beer', brand:'COORS LIGHT',   desc:'B24 12OZ 6P',          size:'12OZ', unit:'Caja', cost:27.00, active:true },
+  { id:54, provider:'Crest Beverage', type:'Beer', brand:'DOS EQUIS',     desc:'LAGER B24 12OZ',       size:'12OZ', unit:'Caja', cost:25.60, active:true },
+  { id:55, provider:'Crest Beverage', type:'Beer', brand:'TECATE',        desc:'B24 12OZ',             size:'12OZ', unit:'Caja', cost:21.60, active:true },
+  { id:56, provider:'Crest Beverage', type:'Beer', brand:'TECATE LIGHT',  desc:'B24 12OZ',             size:'12OZ', unit:'Caja', cost:21.60, active:true },
+  { id:57, provider:'Crest Beverage', type:'Beer', brand:'INDIO',         desc:'B24 12OZ 6P',          size:'12OZ', unit:'Caja', cost:30.50, active:true },
+  // Spirits
+  { id:58, provider:'Crest Beverage', type:'Whiskey/Bourbon', brand:'FIREBALL',         desc:'CINNAMON WHISKY',              size:'750ML', unit:'Botella', cost:0,      active:true },
+  { id:59, provider:'Crest Beverage', type:'Whiskey/Bourbon', brand:"JACK DANIEL'S",    desc:'OLD NO. 7 TENNESSEE WHISKEY',  size:'750ML', unit:'Botella', cost:0,      active:true },
+  { id:60, provider:'Crest Beverage', type:'Whiskey/Bourbon', brand:'WOODFORD RESERVE', desc:'B6',                           size:'1L',    unit:'Botella', cost:35.28, active:true },
+  { id:61, provider:'Crest Beverage', type:'Whiskey/Bourbon', brand:'BUFFALO TRACE',    desc:'BOURBON B12',                  size:'1L',    unit:'Botella', cost:25.56, active:true },
+  { id:62, provider:'Crest Beverage', type:'Vodka',           brand:"TITO'S",           desc:'ORIGINAL B12',                 size:'1L',    unit:'Caja',    cost:257.88,active:true },
+  { id:63, provider:'Crest Beverage', type:'Gin',             brand:"HENDRICK'S",       desc:'B6',                           size:'1L',    unit:'Botella', cost:45.50, active:true },
+  { id:64, provider:'Crest Beverage', type:'Rum',             brand:'CANE RUN',         desc:'WHITE RUM NW B12',             size:'1L',    unit:'Caja',    cost:84.00, active:true },
+  { id:65, provider:'Crest Beverage', type:'Mezcal',          brand:'LOS VECINOS',      desc:'ESPADIN B6',                   size:'750ML', unit:'Caja',    cost:125.94,active:true },
+  { id:66, provider:'Crest Beverage', type:'Tequila',         brand:'TORADA PREMIUM',   desc:'WHITE TEQUILA B12',            size:'1L',    unit:'Caja/12',    cost:87.60, active:true },
+  // Mixers
+  { id:67, provider:'Crest Beverage', type:'Mixer', brand:'FINEST CALL',      desc:'STRAWBERRY PUREE MIX P12', size:'1L',  unit:'Caja', cost:48.60, active:true },
+  { id:68, provider:'Crest Beverage', type:'Mixer', brand:'FINEST CALL',      desc:'PINA COLADA MIXER P12',    size:'1L',  unit:'Caja', cost:46.21, active:true },
+  { id:69, provider:'Crest Beverage', type:'Mixer', brand:'FINEST CALL',      desc:'BAR SYRUP P12',            size:'1L',  unit:'Botella', cost:6.30, active:true },
+  { id:70, provider:'Crest Beverage', type:'Mixer', brand:'FINEST CALL',      desc:'PREMIUM JUICE LIME SOUR',  size:'1L',  unit:'Caja', cost:56.40, active:true },
+  { id:71, provider:'Crest Beverage', type:'Mixer', brand:'FINEST CALL',      desc:'PREMIUM JUICE LEMON SOUR', size:'1L',  unit:'Caja', cost:56.40, active:true },
+  { id:72, provider:'Crest Beverage', type:'Mixer', brand:'MASTER OF MIXES',  desc:'MARGARITA SALT P12',       size:'8OZ', unit:'Caja', cost:17.40, active:true },
+  // ── New Wine & Tequila ─────────────────────────────────────────────────────
+  { id:73, provider:"Southern Glazer's", type:'Wine',    brand:'SUTTER HOME',    desc:'SAUVIGNON BLANC',           size:'187ML', unit:'Caja/24', cost:0, active:true },
+  { id:74, provider:'Breakthru',         type:'Wine',    brand:'STERLING',       desc:'SAUVIGNON BLANC',           size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:75, provider:'Breakthru',         type:'Wine',    brand:'STERLING',       desc:'PINOT GRIGIO BLANC',        size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:76, provider:'Breakthru',         type:'Wine',    brand:"STAG'S LEAP",    desc:'CABERNET SAUVIGNON',        size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:77, provider:'Breakthru',         type:'Wine',    brand:'ROBERT HALL',    desc:'MERLOT',                    size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:78, provider:'Breakthru',         type:'Wine',    brand:'HESS',           desc:'CABERNET SAUVIGNON',        size:'750ML', unit:'Botella', cost:0, active:true },
+  { id:79, provider:'Breakthru',         type:'Tequila', brand:'HERRADURA',      desc:'SILVER',                    size:'750ML', unit:'Botella', cost:0, active:true },
 ];
 
-const TYPE_ORDER = ['Mezcal','Rum','Tequila','Whiskey/Bourbon','Gin','Vodka','Liqueur','Vermouth','Wine','Water','Beer','Other'];
+const TYPE_ORDER = ['Beer','Mezcal','Rum','Tequila','Whiskey/Bourbon','Gin','Vodka','Liqueur','Vermouth','Wine','Mixer','Water','Other'];
 let activeTypeFilter = 'all';
 // Deadline: Tuesday 5pm (day 2 = Tuesday, hour 17)
 const DEADLINE_DAY = 2, DEADLINE_HOUR = 17;
@@ -759,7 +790,7 @@ function renderOrder() {
         row.innerHTML = `
           <div class="product-left">
             <div class="product-info">
-              <div class="product-brand">${prod.brand} <span class="product-size-inline">${prod.size}</span></div>
+              <div class="product-brand">${prod.brand} <span class="product-size-inline">${prod.size}</span>${prod.unit ? '<span style="background:#e8f0fe;border:1px solid #c5d5f5;border-radius:4px;padding:1px 6px;font-size:0.65rem;color:#003580;font-weight:600;margin-left:4px">'+prod.unit+'</span>' : ''}</div>
               <div class="product-desc">${prod.desc}${prod.cost > 0 ? ' · <span style="color:var(--gold)">$'+prod.cost.toFixed(2)+'</span>' : ''}</div>
               ${hint}
             </div>
@@ -1046,8 +1077,9 @@ function renderAdminProducts() {
       <td style="color:var(--teal-light);font-size:0.8rem">${prod.type}</td>
       <td style="font-weight:600">${prod.brand}</td>
       <td style="color:var(--gray)">${prod.desc}</td>
-      <td><span style="background:rgba(201,168,76,0.08);border:1px solid var(--border);border-radius:6px;padding:2px 8px;font-size:0.72rem;color:var(--gold)">${prod.size}</span></td>
-      <td style="color:var(--gold)">${prod.cost > 0 ? '$'+prod.cost.toFixed(2) : '—'}</td>
+      <td><span style="background:#003580;border:none;border-radius:4px;padding:2px 8px;font-size:0.72rem;color:#ffffff;font-weight:600">${prod.size}</span></td>
+      <td style="color:#555555;font-size:0.8rem">${prod.unit || '—'}</td>
+      <td style="color:#003580;font-weight:600">${prod.cost > 0 ? '$'+prod.cost.toFixed(2) : '—'}</td>
       <td>
         <button class="btn-edit" onclick="openProductModal(${prod.id})">Editar</button>
         <button class="btn-delete" onclick="toggleActive(${prod.id})">${prod.active?'Desactivar':'Activar'}</button>
@@ -1071,11 +1103,13 @@ function openProductModal(id = null) {
     document.getElementById('mpBrand').value = p.brand;
     document.getElementById('mpDesc').value = p.desc;
     document.getElementById('mpSize').value = p.size;
+    document.getElementById('mpUnit').value = p.unit || 'Caja';
     document.getElementById('mpCost').value = p.cost || '';
   } else {
     document.getElementById('mpProvider').value = "Southern Glazer's";
     document.getElementById('mpType').value = 'Tequila';
     ['mpBrand','mpDesc','mpSize','mpCost'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('mpUnit').value = 'Caja';
   }
   document.getElementById('productModal').classList.add('open');
 }
@@ -1090,6 +1124,7 @@ function saveProduct() {
     provider: document.getElementById('mpProvider').value,
     type: document.getElementById('mpType').value,
     brand, desc, size,
+    unit: document.getElementById('mpUnit').value,
     cost: parseFloat(document.getElementById('mpCost').value) || 0,
     active: true
   };
