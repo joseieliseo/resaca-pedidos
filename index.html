@@ -494,12 +494,12 @@ function getDeadlineStatus() {
   if (pastDeadlineToday) daysUntil = 7;
   if (daysUntil === 0 && !pastDeadlineToday) {
     const hoursLeft = DEADLINE_HOUR - hour;
-    if (hoursLeft <= 2) return {cls:'warning', msg:'Limite hoy martes a las 5:00 PM - quedan ' + hoursLeft + 'h'};
-    return {cls:'warning', msg:'Limite hoy martes a las 5:00 PM'};
+    if (hoursLeft <= 2) return {cls:'warning', msg:'Limite hoy miercoles a las 5:00 PM - quedan ' + hoursLeft + 'h'};
+    return {cls:'warning', msg:'Limite hoy miercoles a las 5:00 PM'};
   }
-  if (daysUntil === 1) return {cls:'ok', msg:'Limite: manana martes a las 5:00 PM'};
+  if (daysUntil === 1) return {cls:'ok', msg:'Limite: manana miercoles a las 5:00 PM'};
   if (pastDeadlineToday) return {cls:'closed', msg:'Limite cerrado - el pedido de esta semana ya fue enviado'};
-  return {cls:'ok', msg:'Limite de pedido: martes a las 5:00 PM (faltan ' + daysUntil + ' dias)'};
+  return {cls:'ok', msg:'Limite de pedido: miercoles a las 5:00 PM (faltan ' + daysUntil + ' dias)'};
 }
 
 function renderDeadlineBanner() {
