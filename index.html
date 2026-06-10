@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La Resaca — Pedidos</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f2f2f2; --white: #ffffff; --blue: #003580; --blue-btn: #0071c2;
+    --blue-btn-hover: #00487a; --text: #1a1a1a; --text-light: #555555;
+    --border: #cccccc; --border-focus: #003580; --shadow: 0 2px 8px rgba(0,0,0,0.12);
+    --green: #008234; --red: #cc0000;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+
+  /* LOGIN */
+  #loginScreen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #f2f2f2; padding: 20px; }
+  .login-box { background: #fff; border: 1px solid #ccc; border-radius: 12px; padding: 40px 36px; width: 100%; max-width: 380px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+  .login-logo { text-align: center; margin-bottom: 32px; }
+  .login-logo h1 { font-family: 'Playfair Display', serif; color: #003580; font-size: 2rem; letter-spacing: 2px; }
+  .login-logo p { color: #555; font-size: 0.8rem; letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
+  .login-box label { display: block; font-size: 0.8rem; font-weight: 600; color: #1a1a1a; margin-bottom: 6px; }
+  .login-box input { width: 100%; padding: 12px 16px; background: #fff; border: 1px solid #ccc; border-radius: 6px; color: #1a1a1a; font-family: 'DM Sans', sans-serif; font-size: 1rem; margin-bottom: 20px; transition: border-color 0.2s; }
+  .login-box input:focus { outline: none; border-color: #003580; box-shadow: 0 0 0 2px rgba(0,53,128,0.15); }
+  .btn-primary { width: 100%; padding: 14px; background: #0071c2; color: #fff; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: background 0.2s; }
+  .btn-primary:hover { background: #00487a; }
+  .login-error { color: #cc0000; font-size: 0.85rem; margin-top: 12px; text-align: center; display: none; }
+
+  /* APP */
+  #app { display: none; }
+  header { background: #003580; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+  .header-logo { font-family: 'Playfair Display', serif; color: #fff; font-size: 1.3rem; letter-spacing: 1px; }
+  .header-right { display: flex; align-items: center; gap: 16px; }
+  .user-badge { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 6px 14px; font-size: 0.8rem; color: #fff; }
+  .btn-logout { background: transparent; border: 1px solid rgba(255,255,255,0.4); color: rgba(255,255,255,0.8); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-logout:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+  /* NAV */
+  .nav-tabs { display: flex; background: #fff; border-bottom: 2px solid #ccc; padding: 0 24px; gap: 4px; overflow-x: auto; }
+  .nav-tab { padding: 14px 20px; font-size: 0.85rem; font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent; color: #333; white-space: nowrap; transition: all 0.2s; letter-spacing: 0.5px; background: none; border-top: none; border-left: none; border-right: none; font-family: 'DM Sans', sans-serif; }
+  .nav-tab.active { color: #003580; border-bottom-color: #003580; font-weight: 600; }
+  .nav-tab:hover { color: #003580; }
+
+  main { padding: 24px; max-width: 900px; margin: 0 auto; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* DEADLINE / WEEK BANNER */
+  .week-banner { background: #003580; color: #fff; border-radius: 8px; padding: 12px 18px; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; font-weight: 600; }
+  .week-badge { background: rgba(255,255,255,0.2); border-radius: 6px; padding: 2px 10px; margin-left: 4px; }
+  .deadline-banner { display: flex; align-items: center; gap: 12px; padding: 12px 18px; border-radius: 10px; margin-bottom: 20px; font-size: 0.85rem; font-weight: 500; }
+  .deadline-banner.ok { background: #e6f4ea; border: 1px solid #b7dfbe; color: #107c10; }
+  .deadline-banner.warning { background: #fff4ce; border: 1px solid #f9c84e; color: #8a5e00; }
+  .deadline-banner.closed { background: #fde7e9; border: 1px solid #f4a7ab; color: #d13438; }
+
+  /* TYPE FILTER */
+  .type-filter-wrap { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .type-btn { padding: 7px 14px; border-radius: 20px; font-size: 0.78rem; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; border: 1px solid #ccc; background: #fff; color: #333; white-space: nowrap; }
+  .type-btn:hover { border-color: #003580; color: #003580; }
+  .type-btn.active { background: #003580; border-color: #003580; color: #fff; }
+  .type-btn .count { background: rgba(0,0,0,0.08); border-radius: 10px; padding: 1px 6px; font-size: 0.68rem; margin-left: 4px; }
+  .type-btn.active .count { background: rgba(255,255,255,0.25); }
+
+  /* PROVIDER */
+  .provider-block { margin-bottom: 32px; }
+  .provider-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #ccc; }
+  .provider-name { font-family: 'DM Sans', sans-serif; color: #003580; font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  .provider-count { background: #e8f0fe; border: 1px solid #c5d5f5; border-radius: 12px; padding: 3px 10px; font-size: 0.75rem; color: #003580; font-weight: 600; }
+  .spirit-group { margin-bottom: 20px; }
+  .spirit-type-label { font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase; color: #555; margin-bottom: 10px; padding-left: 4px; font-weight: 600; }
+
+  /* PRODUCT ROW */
+  .product-row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px; background: #fff; border: 1px solid #ccc; border-radius: 8px; padding: 12px 16px; margin-bottom: 8px; transition: border-color 0.2s, box-shadow 0.2s; }
+  .product-row:hover { border-color: #003580; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+  .product-row.has-qty { border-color: #0071c2; background: #dbeafe; border-width: 2px; }
+  .product-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .product-info { min-width: 0; }
+  .product-brand { font-weight: 700; font-size: 0.9rem; color: #1a1a1a; }
+  .product-desc { font-size: 0.78rem; color: #555; margin-top: 2px; }
+  .product-size-inline { background: #003580; border: none; border-radius: 4px; padding: 2px 7px; font-size: 0.68rem; color: #fff; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+  .product-unit-inline { background: #e8f0fe; border: 1px solid #c5d5f5; border-radius: 4px; padding: 1px 6px; font-size: 0.65rem; color: #003580; font-weight: 600; margin-left: 4px; }
+  .last-order-hint { font-size: 0.7rem; color: #0071c2; margin-top: 3px; font-weight: 500; }
+
+  /* QTY STEPPER */
+  .qty-stepper { display: flex; align-items: center; gap: 6px; }
+  .qty-btn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid #ccc; background: #f2f2f2; color: #1a1a1a; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', sans-serif; transition: all 0.15s; flex-shrink: 0; }
+  .qty-btn:hover { background: #0071c2; border-color: #0071c2; color: #fff; }
+  .qty-btn:active { transform: scale(0.92); }
+  .qty-input { width: 48px; padding: 6px 4px; background: #fff; border: 1px solid #ccc; border-radius: 6px; color: #1a1a1a; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600; text-align: center; transition: border-color 0.2s; }
+  .qty-input:focus { outline: none; border-color: #0071c2; }
+
+  /* FOOTER */
+  .pedido-footer { position: sticky; bottom: 0; background: #fff; border-top: 2px solid #ccc; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; box-shadow: 0 -2px 8px rgba(0,0,0,0.1); }
+  .pedido-summary { font-size: 0.85rem; color: #1a1a1a; font-weight: 500; }
+  .pedido-summary span { color: #003580; font-weight: 700; }
+  .btn-enviar { background: #0071c2; color: #fff; border: none; border-radius: 6px; padding: 12px 28px; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; }
+  .btn-enviar:hover { background: #00487a; transform: translateY(-1px); }
+  .btn-enviar:disabled { background: #aaa; cursor: not-allowed; transform: none; }
+
+  /* NOTES */
+  .notes-area { width: 100%; padding: 10px 14px; background: #fff; border: 1px solid #ccc; border-radius: 6px; color: #1a1a1a; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; resize: vertical; min-height: 64px; margin-top: 8px; }
+  .notes-area:focus { outline: none; border-color: #0071c2; }
+  .notes-area::placeholder { color: #aaa; }
+  .notes-label { font-size: 0.8rem; font-weight: 600; color: #1a1a1a; margin-top: 20px; display: block; }
+
+  /* ORDERS */
+  .orders-grid { display: flex; flex-direction: column; gap: 16px; }
+  .order-card { background: #fff; border: 1px solid #ccc; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+  .order-card-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: #f2f2f2; border-bottom: 1px solid #ccc; cursor: pointer; flex-wrap: wrap; gap: 8px; }
+  .order-card-title { font-weight: 700; color: #003580; font-size: 0.95rem; }
+  .order-card-meta { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .order-card-body { padding: 16px 20px; display: none; }
+  .order-card-body.open { display: block; }
+  .badge { border-radius: 12px; padding: 3px 10px; font-size: 0.72rem; font-weight: 500; }
+  .badge-user { background: #e8f0fe; color: #003580; border: 1px solid #c5d5f5; }
+  .badge-date { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
+  .badge-provider { background: #f2f2f2; color: #333; border: 1px solid #ccc; }
+  .qty-badge { background: rgba(0,113,194,0.15); color: #0071c2; border-radius: 6px; padding: 2px 8px; font-weight: 600; }
+  .order-items-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  .order-items-table th { text-align: left; padding: 8px 12px; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: #555; border-bottom: 2px solid #e1e8f0; }
+  .order-items-table td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; color: #1a1a1a; }
+  .order-items-table tr:last-child td { border-bottom: none; }
+  .btn-export { background: transparent; border: 1px solid #0071c2; color: #0071c2; padding: 8px 18px; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; cursor: pointer; font-weight: 500; transition: all 0.2s; margin-top: 12px; }
+  .btn-export:hover { background: #0071c2; color: #fff; }
+
+  /* ADMIN PRODUCTS */
+  .admin-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+  .btn-add { background: #0071c2; color: #fff; border: none; border-radius: 6px; padding: 10px 20px; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; }
+  .btn-add:hover { background: #00487a; }
+  .products-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  .products-table th { text-align: left; padding: 10px 12px; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: #555; border-bottom: 2px solid #003580; }
+  .products-table td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; color: #1a1a1a; vertical-align: middle; }
+  .products-table tr:hover td { background: #f9f9f9; }
+  .btn-edit, .btn-delete { border: none; border-radius: 6px; padding: 5px 12px; font-family: 'DM Sans', sans-serif; font-size: 0.78rem; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+  .btn-edit { background: rgba(0,113,194,0.1); color: #0071c2; margin-right: 6px; }
+  .btn-edit:hover { background: #0071c2; color: #fff; }
+  .btn-delete { background: rgba(204,0,0,0.1); color: #cc0000; }
+  .btn-delete:hover { background: #cc0000; color: #fff; }
+  .active-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .active-dot.on { background: #008234; }
+  .active-dot.off { background: #aaa; }
+
+  /* MODALS */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; padding: 20px; display: none; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: #fff; border: 1px solid #ccc; border-radius: 10px; padding: 32px; width: 100%; max-width: 480px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: auto; }
+  .modal h3 { font-family: 'DM Sans', sans-serif; color: #003580; margin-bottom: 24px; font-size: 1.2rem; font-weight: 700; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: #1a1a1a; margin-bottom: 6px; }
+  .form-group input, .form-group select { width: 100%; padding: 10px 14px; background: #fff; border: 1px solid #ccc; border-radius: 6px; color: #1a1a1a; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; }
+  .form-group input:focus, .form-group select:focus { outline: none; border-color: #003580; }
+  .modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
+  .btn-cancel { background: transparent; border: 1px solid #ccc; color: #555; padding: 10px 20px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; cursor: pointer; }
+  .btn-save { background: #0071c2; color: #fff; border: none; border-radius: 6px; padding: 10px 24px; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 0.85rem; cursor: pointer; }
+
+  /* CONFIRM MODAL */
+  .confirm-items { max-height: 320px; overflow-y: auto; margin: 16px 0; }
+  .confirm-provider { font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; color: #0071c2; margin: 14px 0 8px; }
+  .confirm-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.85rem; }
+  .confirm-row:last-child { border-bottom: none; }
+  .confirm-prod { color: #1a1a1a; }
+  .confirm-prod span { color: #555; font-size: 0.78rem; margin-left: 6px; }
+  .confirm-qty { background: rgba(0,113,194,0.15); color: #0071c2; border-radius: 6px; padding: 2px 10px; font-weight: 700; }
+
+  /* FILTER */
+  .filter-bar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+  .filter-select { padding: 8px 14px; background: #fff; border: 1px solid #ccc; border-radius: 6px; color: #1a1a1a; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #003580; color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 0.9rem; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 2000; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+  .empty-state { text-align: center; padding: 60px 20px; color: #aaa; }
+  .empty-state .icon { font-size: 3rem; margin-bottom: 16px; }
+
+  @media (max-width: 600px) {
+    main { padding: 16px; }
+    .login-box { padding: 32px 24px; }
+    header { padding: 12px 16px; }
+    .header-logo { font-size: 1.1rem; }
+  }
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <h1>La Resaca</h1>
+      <p>Seafood Bar — Pedidos</p>
+    </div>
+    <label for="username">Usuario</label>
+    <input type="text" id="username" placeholder="Tu usuario" autocomplete="username">
+    <label for="password">Contraseña</label>
+    <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+    <button class="btn-primary" onclick="doLogin()">Entrar</button>
+    <div class="login-error" id="loginError">Usuario o contraseña incorrectos</div>
+  </div>
+</div>
+
+<div id="app">
+  <header>
+    <div class="header-logo">La Resaca</div>
+    <div class="header-right">
+      <div class="user-badge" id="userBadge">—</div>
+      <button class="btn-logout" onclick="doLogout()">Salir</button>
+    </div>
+  </header>
+  <div class="nav-tabs" id="navTabs"></div>
+  <main>
+    <div class="section" id="sectionOrder">
+      <div id="deadlineBanner"></div>
+      <div class="type-filter-wrap" id="typeFilterWrap"></div>
+      <div id="orderProviders"></div>
+    </div>
+    <div class="section" id="sectionAdminOrders">
+      <div class="filter-bar">
+        <select class="filter-select" id="filterWeek" onchange="renderAdminOrders()">
+          <option value="">Todas las semanas</option>
+        </select>
+        <select class="filter-select" id="filterProvider" onchange="renderAdminOrders()">
+          <option value="">Todos los proveedores</option>
+          <option value="Southern Glazers">Southern Glazer's</option>
+          <option value="Breakthru">Breakthru</option>
+          <option value="Crest Beverage">Crest Beverage</option>
+        </select>
+      </div>
+      <div class="orders-grid" id="ordersGrid"></div>
+    </div>
+    <div class="section" id="sectionAdminProducts">
+      <div class="admin-toolbar">
+        <div style="color:#555;font-size:0.85rem;" id="productCount"></div>
+        <button class="btn-add" onclick="openProductModal()">+ Agregar Producto</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="products-table">
+          <thead><tr><th>Activo</th><th>Proveedor</th><th>Tipo</th><th>Marca</th><th>Descripcion</th><th>Tamano</th><th>Unidad</th><th>Costo</th><th>Acciones</th></tr></thead>
+          <tbody id="productsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+  <div class="pedido-footer" id="pedidoFooter" style="display:none;">
+    <div class="pedido-summary">Seleccionados: <span id="itemCount">0</span></div>
+    <button class="btn-enviar" id="btnEnviar" onclick="submitOrder()" disabled>Enviar Pedido</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="productModal">
+  <div class="modal">
+    <h3 id="modalTitle">Agregar Producto</h3>
+    <div class="form-group"><label>Proveedor</label>
+      <select id="mpProvider">
+        <option value="Southern Glazers">Southern Glazer's</option>
+        <option value="Breakthru">Breakthru</option>
+        <option value="Crest Beverage">Crest Beverage</option>
+      </select></div>
+    <div class="form-group"><label>Tipo</label>
+      <select id="mpType"><option>Beer</option><option>Mezcal</option><option>Rum</option><option>Tequila</option><option>Whiskey/Bourbon</option><option>Gin</option><option>Vodka</option><option>Liqueur</option><option>Vermouth</option><option>Wine</option><option>Mixer</option><option>Water</option><option>Other</option></select></div>
+    <div class="form-group"><label>Marca</label><input type="text" id="mpBrand" placeholder="Ej: DON JULIO"></div>
+    <div class="form-group"><label>Descripcion</label><input type="text" id="mpDesc" placeholder="Ej: TEQUILA BLANCO"></div>
+    <div class="form-group"><label>Tamano</label><input type="text" id="mpSize" placeholder="Ej: 750ML"></div>
+    <div class="form-group"><label>Unidad de Compra</label>
+      <select id="mpUnit"><option value="Caja">Caja</option><option value="Botella">Botella</option><option value="Caja/6">Caja/6</option><option value="Caja/12">Caja/12</option><option value="Caja/24">Caja/24</option><option value="Six-pack">Six-pack</option><option value="Pack">Pack</option><option value="Keg">Keg</option></select></div>
+    <div class="form-group"><label>Costo ($)</label><input type="number" id="mpCost" placeholder="0.00" step="0.01" min="0"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeProductModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveProduct()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal">
+    <h3>Confirmar Pedido</h3>
+    <div id="confirmSummary" class="confirm-items"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeConfirmModal()">Revisar</button>
+      <button class="btn-save" onclick="confirmAndSubmit()">Confirmar Envio</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div id="loadingOverlay" style="display:none;position:fixed;inset:0;background:rgba(255,255,255,0.85);z-index:5000;align-items:center;justify-content:center;flex-direction:column;gap:16px;">
+  <div style="width:40px;height:40px;border:4px solid #e0e0e0;border-top-color:#003580;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+  <div style="color:#003580;font-weight:600;font-size:0.9rem;font-family:'DM Sans',sans-serif;">Cargando...</div>
+</div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
+<script type="module">
+const USERS = {
+  claudia: { password: 'Resaca2026', name: 'Claudia Ochoa', role: 'staff' },
+  mayra:   { password: 'Sonora2026', name: 'Mayra Rivera',  role: 'staff' },
+  jose:    { password: 'Admin2026#', name: 'Jose',          role: 'admin' }
+};
+
+const SG = 'Southern Glazers';
+const BT = 'Breakthru';
+const CR = 'Crest Beverage';
+
+const DEFAULT_PRODUCTS = [
+  {id:1,  p:SG, t:'Tequila',         b:'DON JULIO',       d:'TEQUILA BLANCO',                        s:'750ML', u:'Botella', c:0, a:true},
+  {id:2,  p:SG, t:'Tequila',         b:'DON JULIO',       d:'TEQUILA REPOSADO',                      s:'750ML', u:'Botella', c:0, a:true},
+  {id:3,  p:SG, t:'Tequila',         b:'DON JULIO',       d:'TEQUILA ANEJO',                         s:'750ML', u:'Botella', c:0, a:true},
+  {id:4,  p:SG, t:'Tequila',         b:'DON JULIO',       d:'TEQUILA ANEJO 70TH ANNIVERSARY',        s:'750ML', u:'Botella', c:0, a:true},
+  {id:5,  p:SG, t:'Tequila',         b:'PATRON',          d:'TEQUILA SILVER',                        s:'750ML', u:'Botella', c:0, a:true},
+  {id:6,  p:SG, t:'Tequila',         b:'GRAN MALO',       d:'TAMARINDO TEQUILA LIQUEUR',             s:'750ML', u:'Botella', c:0, a:true},
+  {id:7,  p:SG, t:'Whiskey/Bourbon', b:'BUCHANANS',       d:'BLENDED SCOTCH DELUXE 12 YR',           s:'750ML', u:'Botella', c:0, a:true},
+  {id:8,  p:SG, t:'Whiskey/Bourbon', b:'BUCHANANS',       d:'SCOTCH WHISKEY PINEAPPLE',              s:'750ML', u:'Botella', c:0, a:true},
+  {id:9,  p:SG, t:'Whiskey/Bourbon', b:'BUFFALO TRACE',   d:'KENTUCKY STRAIGHT BOURBON',             s:'750ML', u:'Botella', c:0, a:true},
+  {id:10, p:SG, t:'Whiskey/Bourbon', b:'BULLEIT',         d:'STRAIGHT BOURBON FRONTIER WHISKEY 6 YR',s:'750ML', u:'Botella', c:0, a:true},
+  {id:11, p:SG, t:'Whiskey/Bourbon', b:'JAMESON',         d:'BLENDED IRISH WHISKEY',                 s:'750ML', u:'Botella', c:0, a:true},
+  {id:12, p:SG, t:'Whiskey/Bourbon', b:'JOHNNIE WALKER',  d:'BLENDED SCOTCH BLACK LABEL 12 YR',      s:'750ML', u:'Botella', c:0, a:true},
+  {id:13, p:SG, t:'Whiskey/Bourbon', b:'MACALLAN',        d:'HIGHLAND SINGLE MALT 12 YR',            s:'750ML', u:'Botella', c:0, a:true},
+  {id:14, p:SG, t:'Whiskey/Bourbon', b:'MAKERS MARK',     d:'STRAIGHT BOURBON',                      s:'750ML', u:'Botella', c:0, a:true},
+  {id:15, p:SG, t:'Whiskey/Bourbon', b:'TEMPLETON',       d:'RYE 4 YEARS',                           s:'750ML', u:'Botella', c:0, a:true},
+  {id:16, p:SG, t:'Rum',             b:'BACARDI',         d:'LIGHT RUM SUPERIOR',                    s:'1L',    u:'Botella', c:0, a:true},
+  {id:17, p:SG, t:'Gin',             b:'MALFY',           d:'ORIGINALE GIN ITALY',                   s:'750ML', u:'Botella', c:0, a:true},
+  {id:18, p:SG, t:'Gin',             b:'TANQUERAY',       d:'LONDON DRY GIN',                        s:'750ML', u:'Botella', c:0, a:true},
+  {id:19, p:SG, t:'Vodka',           b:'STOLI',           d:'BLUEBERRY FLAVORED VODKA',              s:'750ML', u:'Botella', c:0, a:true},
+  {id:20, p:SG, t:'Liqueur',         b:'APEROL',          d:'APERITIVO',                             s:'750ML', u:'Botella', c:0, a:true},
+  {id:21, p:SG, t:'Liqueur',         b:'BAILEYS',         d:'IRISH CREAM LIQUEUR THE ORIGINAL',      s:'750ML', u:'Botella', c:0, a:true},
+  {id:22, p:SG, t:'Liqueur',         b:'GRAND MARNIER',   d:'COGNAC AND ORANGE LIQUEUR CORDON ROUGE',s:'750ML', u:'Botella', c:0, a:true},
+  {id:23, p:SG, t:'Liqueur',         b:'KAHLUA',          d:'RUM AND COFFEE LIQUEUR',                s:'750ML', u:'Botella', c:0, a:true},
+  {id:24, p:SG, t:'Liqueur',         b:'LICOR 43',        d:'HERBAL LIQUEUR',                        s:'750ML', u:'Botella', c:0, a:true},
+  {id:25, p:SG, t:'Liqueur',         b:'MIDORI',          d:'MELON LIQUEUR',                         s:'750ML', u:'Botella', c:0, a:true},
+  {id:26, p:SG, t:'Vermouth',        b:'MARTINI AND ROSSI',d:'EXTRA DRY VERMOUTH',                   s:'750ML', u:'Botella', c:0, a:true},
+  {id:27, p:SG, t:'Wine',            b:'SUTTER HOME',     d:'SAUVIGNON BLANC',                       s:'187ML', u:'Caja/24', c:0, a:true},
+  {id:28, p:BT, t:'Mezcal',          b:'400 CONEJOS',     d:'MEZCAL JOVEN',                          s:'750ML', u:'Caja/6',  c:0, a:true},
+  {id:29, p:BT, t:'Tequila',         b:'1800',            d:'TEQUILA SILVER',                        s:'1L',    u:'Caja/12', c:0, a:true},
+  {id:30, p:BT, t:'Tequila',         b:'CONCIERE',        d:'TEQUILA SILVER',                        s:'1L',    u:'Caja/12', c:0, a:true},
+  {id:31, p:BT, t:'Tequila',         b:'MAESTRO DOBEL',   d:'TEQUILA DIAMANTE',                      s:'750ML', u:'Botella', c:0, a:true},
+  {id:32, p:BT, t:'Tequila',         b:'HERRADURA',       d:'SILVER',                                s:'750ML', u:'Botella', c:0, a:true},
+  {id:33, p:BT, t:'Rum',             b:'CONCIERE',        d:'RUM SILVER',                            s:'1L',    u:'Caja/12', c:0, a:true},
+  {id:34, p:BT, t:'Rum',             b:'PLANTERAY',       d:'BARBADOS RUM AGED 5 YR',                s:'750ML', u:'Botella', c:0, a:true},
+  {id:35, p:BT, t:'Whiskey/Bourbon', b:'TULLAMORE DEW',   d:'IRISH WHISKEY',                         s:'750ML', u:'Botella', c:0, a:true},
+  {id:36, p:BT, t:'Liqueur',         b:'BOLS',            d:'LIQUEUR MELON',                         s:'1L',    u:'Botella', c:0, a:true},
+  {id:37, p:BT, t:'Liqueur',         b:'BOLS',            d:'LIQUEUR PEACH SCHNAPPS',                s:'1L',    u:'Botella', c:0, a:true},
+  {id:38, p:BT, t:'Liqueur',         b:'BOLS',            d:'LIQUEUR POMEGRANATE',                   s:'1L',    u:'Botella', c:0, a:true},
+  {id:39, p:BT, t:'Liqueur',         b:'BOLS',            d:'LIQUEUR WATERMELON',                    s:'1L',    u:'Botella', c:0, a:true},
+  {id:40, p:BT, t:'Liqueur',         b:'DISARONNO',       d:'ORIGINALE AMARETTO',                    s:'750ML', u:'Botella', c:0, a:true},
+  {id:41, p:BT, t:'Liqueur',         b:'TIA MARIA',       d:'COFFEE LIQUEUR',                        s:'1L',    u:'Botella', c:0, a:true},
+  {id:42, p:BT, t:'Wine',            b:'BAREFOOT',        d:'CABERNET SAUVIGNON PET 6/4PK',          s:'187ML', u:'Caja/24', c:0, a:true},
+  {id:43, p:BT, t:'Wine',            b:'BAREFOOT',        d:'CHARDONNAY PET 6/4PK',                  s:'187ML', u:'Caja/24', c:0, a:true},
+  {id:44, p:BT, t:'Wine',            b:'BAREFOOT',        d:'MERLOT PET 6/4PK',                      s:'187ML', u:'Caja/24', c:0, a:true},
+  {id:45, p:BT, t:'Wine',            b:'CYT FRONTERA',    d:'CHARDONNAY 6/4PK',                      s:'187ML', u:'Caja/24', c:0, a:true},
+  {id:46, p:BT, t:'Wine',            b:'DAOU',            d:'CABERNET SAUVIGNON',                    s:'750ML', u:'Caja/12', c:0, a:true},
+  {id:47, p:BT, t:'Wine',            b:'HESS',            d:'CABERNET SAUVIGNON',                    s:'750ML', u:'Botella', c:0, a:true},
+  {id:48, p:BT, t:'Wine',            b:'ROBERT HALL',     d:'MERLOT',                                s:'750ML', u:'Botella', c:0, a:true},
+  {id:49, p:BT, t:'Wine',            b:'STAGS LEAP',      d:'CABERNET SAUVIGNON',                    s:'750ML', u:'Botella', c:0, a:true},
+  {id:50, p:BT, t:'Wine',            b:'STELLA ROSA',     d:'BLACK',                                 s:'750ML', u:'Caja/12', c:0, a:true},
+  {id:51, p:BT, t:'Wine',            b:'STELLA ROSA',     d:'MOSCATO DASTI DOCG',                    s:'750ML', u:'Caja/12', c:0, a:true},
+  {id:52, p:BT, t:'Wine',            b:'STELLA ROSA',     d:'PEACH 12/2PK',                          s:'187ML', u:'Caja/24', c:0, a:true},
+  {id:53, p:BT, t:'Wine',            b:'STELLA ROSA',     d:'ROSSO 12/2PK',                          s:'187ML', u:'Caja/24', c:0, a:true},
+  {id:54, p:BT, t:'Wine',            b:'STERLING',        d:'SAUVIGNON BLANC',                       s:'750ML', u:'Botella', c:0, a:true},
+  {id:55, p:BT, t:'Wine',            b:'STERLING',        d:'PINOT GRIGIO BLANC',                    s:'750ML', u:'Botella', c:0, a:true},
+  {id:56, p:BT, t:'Water',           b:'VOSS',            d:'PURE WATER STILL',                      s:'375ML', u:'Caja/24', c:0, a:true},
+  {id:57, p:CR, t:'Beer',            b:'CORONA',          d:'EXTRA B24 12OZ',                        s:'12OZ',  u:'Caja',    c:26.95, a:true},
+  {id:58, p:CR, t:'Beer',            b:'CORONA NA',       d:'B24 12OZ 6P',                           s:'12OZ',  u:'Caja',    c:30.50, a:true},
+  {id:59, p:CR, t:'Beer',            b:'PACIFICO',        d:'B24 12OZ',                              s:'12OZ',  u:'Caja',    c:25.60, a:true},
+  {id:60, p:CR, t:'Beer',            b:'COORS LIGHT',     d:'B24 12OZ 6P',                           s:'12OZ',  u:'Caja',    c:27.00, a:true},
+  {id:61, p:CR, t:'Beer',            b:'DOS EQUIS',       d:'LAGER B24 12OZ',                        s:'12OZ',  u:'Caja',    c:25.60, a:true},
+  {id:62, p:CR, t:'Beer',            b:'TECATE',          d:'B24 12OZ',                              s:'12OZ',  u:'Caja',    c:21.60, a:true},
+  {id:63, p:CR, t:'Beer',            b:'TECATE LIGHT',    d:'B24 12OZ',                              s:'12OZ',  u:'Caja',    c:21.60, a:true},
+  {id:64, p:CR, t:'Beer',            b:'INDIO',           d:'B24 12OZ 6P',                           s:'12OZ',  u:'Caja',    c:30.50, a:true},
+  {id:65, p:CR, t:'Whiskey/Bourbon', b:'FIREBALL',        d:'CINNAMON WHISKY',                       s:'750ML', u:'Botella', c:0,     a:true},
+  {id:66, p:CR, t:'Whiskey/Bourbon', b:'JACK DANIELS',    d:'OLD NO 7 TENNESSEE WHISKEY',            s:'750ML', u:'Botella', c:0,     a:true},
+  {id:67, p:CR, t:'Whiskey/Bourbon', b:'WOODFORD RESERVE',d:'KENTUCKY STRAIGHT BOURBON',             s:'1L',    u:'Botella', c:35.28, a:true},
+  {id:68, p:CR, t:'Whiskey/Bourbon', b:'BUFFALO TRACE',   d:'BOURBON B12',                           s:'1L',    u:'Botella', c:25.56, a:true},
+  {id:69, p:CR, t:'Vodka',           b:'TITOS',           d:'ORIGINAL B12',                          s:'1L',    u:'Caja',    c:257.88,a:true},
+  {id:70, p:CR, t:'Gin',             b:'HENDRICKS',       d:'GIN B6',                                s:'1L',    u:'Botella', c:45.50, a:true},
+  {id:71, p:CR, t:'Rum',             b:'CANE RUN',        d:'WHITE RUM NW B12',                      s:'1L',    u:'Caja',    c:84.00, a:true},
+  {id:72, p:CR, t:'Mezcal',          b:'LOS VECINOS',     d:'ESPADIN B6',                            s:'750ML', u:'Caja',    c:125.94,a:true},
+  {id:73, p:CR, t:'Tequila',         b:'TORADA PREMIUM',  d:'WHITE TEQUILA',                         s:'750ML', u:'Caja/12', c:0,     a:true},
+  {id:74, p:CR, t:'Mixer',           b:'FINEST CALL',     d:'STRAWBERRY PUREE MIX P12',              s:'1L',    u:'Caja',    c:48.60, a:true},
+  {id:75, p:CR, t:'Mixer',           b:'FINEST CALL',     d:'PINA COLADA MIXER P12',                 s:'1L',    u:'Caja',    c:46.21, a:true},
+  {id:76, p:CR, t:'Mixer',           b:'FINEST CALL',     d:'BAR SYRUP P12',                         s:'1L',    u:'Botella', c:6.30,  a:true},
+  {id:77, p:CR, t:'Mixer',           b:'FINEST CALL',     d:'PREMIUM JUICE LIME SOUR',               s:'1L',    u:'Caja',    c:56.40, a:true},
+  {id:78, p:CR, t:'Mixer',           b:'FINEST CALL',     d:'PREMIUM JUICE LEMON SOUR',              s:'1L',    u:'Caja',    c:56.40, a:true},
+  {id:79, p:CR, t:'Mixer',           b:'MASTER OF MIXES', d:'MARGARITA SALT P12',                    s:'8OZ',   u:'Caja',    c:17.40, a:true},
+];
+
+// Map short keys to full names for display
+function pName(p) {
+  if (p === SG) return "Southern Glazer's";
+  return p;
+}
+
+const TYPE_ORDER = ['Beer','Mezcal','Rum','Tequila','Whiskey/Bourbon','Gin','Vodka','Liqueur','Vermouth','Wine','Mixer','Water','Other'];
+const DEADLINE_DAY = 2, DEADLINE_HOUR = 17;
+let activeTypeFilter = 'all';
+let currentUser = null;
+let products = [];
+let orders = [];
+let quantities = {};
+let notes = {};
+let editingProductId = null;
+let nextId = 200;
+
+// ── FIREBASE ───────────────────────────────────────────────────
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAgMoLUggwjHgEvY3GVCbfxlIQ8iMcjGIM",
+  authDomain: "resaca-pedidos.firebaseapp.com",
+  projectId: "resaca-pedidos",
+  storageBucket: "resaca-pedidos.firebasestorage.app",
+  messagingSenderId: "783085389674",
+  appId: "1:783085389674:web:6029843dafba3e62888713"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const db = getFirestore(fbApp);
+
+function showLoadingOverlay(show) {
+  const el = document.getElementById('loadingOverlay');
+  if (el) el.style.display = show ? 'flex' : 'none';
+}
+
+async function loadState() {
+  showLoadingOverlay(true);
+  try {
+    const pSnap = await getDoc(doc(db, 'resaca', 'products'));
+    if (pSnap.exists()) {
+      const d = pSnap.data();
+      products = d.list && d.list.length ? d.list : JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+      nextId = d.nextId || 200;
+    } else {
+      products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+      nextId = 200;
+    }
+    const oSnap = await getDoc(doc(db, 'resaca', 'orders'));
+    orders = (oSnap.exists() && oSnap.data().list) ? oSnap.data().list : [];
+  } catch(e) {
+    console.error('Firebase loadState error:', e);
+    products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+    orders = [];
+  }
+  showLoadingOverlay(false);
+}
+
+async function saveProducts() {
+  try {
+    await setDoc(doc(db, 'resaca', 'products'), { list: products, nextId: nextId });
+  } catch(e) { console.error('saveProducts error:', e); showToast('Error al guardar productos'); }
+}
+
+async function saveOrders() {
+  try {
+    await setDoc(doc(db, 'resaca', 'orders'), { list: orders });
+  } catch(e) { console.error('saveOrders error:', e); showToast('Error al guardar pedido'); }
+}
+
+// Week logic
+function getCurrentOrderWeek() {
+  const now = new Date();
+  const day = now.getDay();
+  const hour = now.getHours();
+  const pastDeadline = (day === DEADLINE_DAY && hour >= DEADLINE_HOUR) || (day > DEADLINE_DAY && day !== 0);
+  let monday = new Date(now);
+  const diffToMonday = day === 0 ? -6 : 1 - day;
+  monday.setDate(now.getDate() + diffToMonday);
+  monday.setHours(0,0,0,0);
+  if (pastDeadline) monday.setDate(monday.getDate() + 7);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  const fmt = d => d.toLocaleDateString('es-MX', {day:'2-digit', month:'short'});
+  return { label: fmt(monday) + ' - ' + fmt(sunday), monday, sunday };
+}
+function getOrderWeekKey() { return getCurrentOrderWeek().label; }
+
+function getDeadlineStatus() {
+  const now = new Date();
+  const day = now.getDay();
+  const hour = now.getHours();
+  const min = now.getMinutes();
+  let daysUntil = (DEADLINE_DAY - day + 7) % 7;
+  const pastDeadlineToday = (day === DEADLINE_DAY && hour >= DEADLINE_HOUR);
+  if (pastDeadlineToday) daysUntil = 7;
+  if (daysUntil === 0 && !pastDeadlineToday) {
+    const hoursLeft = DEADLINE_HOUR - hour;
+    if (hoursLeft <= 2) return {cls:'warning', msg:'Limite hoy martes a las 5:00 PM - quedan ' + hoursLeft + 'h'};
+    return {cls:'warning', msg:'Limite hoy martes a las 5:00 PM'};
+  }
+  if (daysUntil === 1) return {cls:'ok', msg:'Limite: manana martes a las 5:00 PM'};
+  if (pastDeadlineToday) return {cls:'closed', msg:'Limite cerrado - el pedido de esta semana ya fue enviado'};
+  return {cls:'ok', msg:'Limite de pedido: martes a las 5:00 PM (faltan ' + daysUntil + ' dias)'};
+}
+
+function renderDeadlineBanner() {
+  const s = getDeadlineStatus();
+  const week = getCurrentOrderWeek();
+  const el = document.getElementById('deadlineBanner');
+  el.innerHTML =
+    '<div class="week-banner">Semana de pedido: <span class="week-badge">' + week.label + '</span></div>' +
+    '<div class="deadline-banner ' + s.cls + '">' + s.msg + '</div>';
+}
+
+function getLastOrderQty(productId) {
+  for (const order of orders) {
+    if (order.user !== currentUser.key) continue;
+    const item = order.items.find(i => i.id === productId);
+    if (item) return item.qty;
+  }
+  return null;
+}
+
+// AUTH
+function doLogin() {
+  const u = document.getElementById('username').value.trim().toLowerCase();
+  const p = document.getElementById('password').value;
+  if (USERS[u] && USERS[u].password === p) {
+    currentUser = {key: u, name: USERS[u].name, role: USERS[u].role};
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('userBadge').textContent = currentUser.name;
+    quantities = {}; notes = {};
+    initApp();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+}
+function doLogout() {
+  currentUser = null; quantities = {}; notes = {};
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('username').value = '';
+  document.getElementById('password').value = '';
+  document.getElementById('loginError').style.display = 'none';
+}
+document.getElementById('password').addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
+
+async function initApp() {
+  await loadState();
+  buildNav();
+  showSection(currentUser.role === 'admin' ? 'sectionAdminOrders' : 'sectionOrder');
+}
+
+function buildNav() {
+  const tabs = document.getElementById('navTabs');
+  tabs.innerHTML = '';
+  const items = currentUser.role === 'admin'
+    ? [['sectionAdminOrders','Pedidos'],['sectionAdminProducts','Productos']]
+    : [['sectionOrder','Nuevo Pedido']];
+  items.forEach(function(item) {
+    const btn = document.createElement('button');
+    btn.className = 'nav-tab';
+    btn.textContent = item[1];
+    btn.dataset.section = item[0];
+    btn.onclick = function() { showSection(item[0]); };
+    tabs.appendChild(btn);
+  });
+}
+
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
+  document.querySelectorAll('.nav-tab').forEach(function(t) { t.classList.toggle('active', t.dataset.section === id); });
+  document.getElementById(id).classList.add('active');
+  document.getElementById('pedidoFooter').style.display = id === 'sectionOrder' ? 'flex' : 'none';
+  if (id === 'sectionOrder') { activeTypeFilter = 'all'; renderOrder(); }
+  if (id === 'sectionAdminOrders') renderAdminOrders();
+  if (id === 'sectionAdminProducts') renderAdminProducts();
+}
+
+// TYPE FILTERS
+function renderTypeFilters() {
+  const active = products.filter(function(p) { return p.a; });
+  const wrap = document.getElementById('typeFilterWrap');
+  wrap.innerHTML = '';
+  const typeCounts = {};
+  active.forEach(function(p) { typeCounts[p.t] = (typeCounts[p.t] || 0) + 1; });
+  const types = TYPE_ORDER.filter(function(t) { return typeCounts[t]; });
+
+  function makeBtn(label, filterVal, count) {
+    const btn = document.createElement('button');
+    btn.className = 'type-btn' + (activeTypeFilter === filterVal ? ' active' : '');
+    btn.innerHTML = label + ' <span class="count">' + count + '</span>';
+    btn.onclick = function() { activeTypeFilter = filterVal; renderOrder(); };
+    wrap.appendChild(btn);
+  }
+  makeBtn('Todos', 'all', active.length);
+  types.forEach(function(type) { makeBtn(type, type, typeCounts[type]); });
+}
+
+// ORDER
+function renderOrder() {
+  renderDeadlineBanner();
+  renderTypeFilters();
+  const container = document.getElementById('orderProviders');
+  container.innerHTML = '';
+  let active = products.filter(function(p) { return p.a; });
+  if (activeTypeFilter !== 'all') active = active.filter(function(p) { return p.t === activeTypeFilter; });
+  if (!active.length) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">search</div><p>No hay productos en esta categoria</p></div>';
+    updateFooter(); return;
+  }
+  const providers = [];
+  active.forEach(function(p) { if (providers.indexOf(p.p) === -1) providers.push(p.p); });
+  providers.forEach(function(prov) {
+    const provProds = active.filter(function(p) { return p.p === prov; });
+    const block = document.createElement('div');
+    block.className = 'provider-block';
+    block.innerHTML = '<div class="provider-header"><div class="provider-name">' + pName(prov) + '</div><div class="provider-count">' + provProds.length + ' productos</div></div>';
+    const byType = {};
+    TYPE_ORDER.forEach(function(t) {
+      const items = provProds.filter(function(p) { return p.t === t; });
+      if (items.length) byType[t] = items;
+    });
+    Object.keys(byType).forEach(function(type) {
+      const items = byType[type];
+      const group = document.createElement('div');
+      group.className = 'spirit-group';
+      if (activeTypeFilter === 'all') group.innerHTML = '<div class="spirit-type-label">' + type + '</div>';
+      items.sort(function(a,b) { return a.b.localeCompare(b.b); }).forEach(function(prod) {
+        const lastQty = getLastOrderQty(prod.id);
+        const hint = lastQty !== null ? '<div class="last-order-hint">ult. pedido: ' + lastQty + '</div>' : '';
+        const unitBadge = prod.u ? '<span class="product-unit-inline">' + prod.u + '</span>' : '';
+        const costTxt = prod.c > 0 ? ' · <span style="color:#0071c2">$' + prod.c.toFixed(2) + '</span>' : '';
+        const row = document.createElement('div');
+        row.className = 'product-row' + (quantities[prod.id] > 0 ? ' has-qty' : '');
+        row.id = 'row-' + prod.id;
+        row.innerHTML =
+          '<div class="product-left"><div class="product-info">' +
+          '<div class="product-brand">' + prod.b + ' <span class="product-size-inline">' + prod.s + '</span>' + unitBadge + '</div>' +
+          '<div class="product-desc">' + prod.d + costTxt + '</div>' + hint +
+          '</div></div>' +
+          '<div class="qty-stepper">' +
+          '<button class="qty-btn" onclick="stepQty(' + prod.id + ',-1)">-</button>' +
+          '<input class="qty-input" type="number" min="0" max="99" placeholder="0" id="qty-' + prod.id + '" value="' + (quantities[prod.id] || '') + '" onchange="updateQty(' + prod.id + ',this.value)" oninput="updateQty(' + prod.id + ',this.value)">' +
+          '<button class="qty-btn" onclick="stepQty(' + prod.id + ',1)">+</button>' +
+          '</div>';
+        group.appendChild(row);
+      });
+      block.appendChild(group);
+    });
+    const notesDiv = document.createElement('div');
+    notesDiv.innerHTML = '<label class="notes-label">Notas para ' + pName(prov) + '</label>' +
+      '<textarea class="notes-area" placeholder="Productos nuevos, preguntas, urgencias..." oninput="notes[\'' + prov + '\']=this.value">' + (notes[prov] || '') + '</textarea>';
+    block.appendChild(notesDiv);
+    container.appendChild(block);
+  });
+  updateFooter();
+}
+
+function stepQty(id, delta) {
+  const current = quantities[id] || 0;
+  const next = Math.max(0, Math.min(99, current + delta));
+  const input = document.getElementById('qty-' + id);
+  if (input) input.value = next || '';
+  updateQty(id, next);
+}
+
+function updateQty(id, val) {
+  const n = parseInt(val) || 0;
+  if (n > 0) quantities[id] = n; else delete quantities[id];
+  const row = document.getElementById('row-' + id);
+  if (row) row.className = 'product-row' + (n > 0 ? ' has-qty' : '');
+  updateFooter();
+}
+
+function updateFooter() {
+  const count = Object.values(quantities).filter(function(v) { return v > 0; }).length;
+  document.getElementById('itemCount').textContent = count;
+  document.getElementById('btnEnviar').disabled = count === 0;
+}
+
+function submitOrder() {
+  if (!Object.keys(quantities).length) return;
+  const byProvider = {};
+  Object.entries(quantities).forEach(function(entry) {
+    const id = entry[0], qty = entry[1];
+    const prod = products.find(function(p) { return p.id == id; });
+    if (!prod) return;
+    if (!byProvider[prod.p]) byProvider[prod.p] = [];
+    byProvider[prod.p].push(Object.assign({}, prod, {qty: qty}));
+  });
+  let html = '';
+  Object.entries(byProvider).forEach(function(entry) {
+    const prov = entry[0], items = entry[1];
+    html += '<div class="confirm-provider">' + pName(prov) + '</div>';
+    items.sort(function(a,b) { return a.b.localeCompare(b.b); }).forEach(function(i) {
+      html += '<div class="confirm-row"><div class="confirm-prod">' + i.b + '<span>' + i.d + ' - ' + i.s + '</span></div><span class="confirm-qty">' + i.qty + '</span></div>';
+    });
+    if (notes[prov]) html += '<div style="margin-top:8px;padding:8px;background:#f9f9f9;border-radius:6px;font-size:0.78rem;color:#555">Nota: ' + notes[prov] + '</div>';
+  });
+  document.getElementById('confirmSummary').innerHTML = html;
+  document.getElementById('confirmModal').classList.add('open');
+}
+
+function closeConfirmModal() { document.getElementById('confirmModal').classList.remove('open'); }
+
+async function confirmAndSubmit() {
+  closeConfirmModal();
+  const now = new Date();
+  const dateStr = getOrderWeekKey();
+  const timeStr = now.toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit'});
+  const byProvider = {};
+  Object.entries(quantities).forEach(function(entry) {
+    const id = entry[0], qty = entry[1];
+    const prod = products.find(function(p) { return p.id == id; });
+    if (!prod) return;
+    if (!byProvider[prod.p]) byProvider[prod.p] = [];
+    byProvider[prod.p].push(Object.assign({}, prod, {qty: qty}));
+  });
+  Object.entries(byProvider).forEach(function(entry) {
+    const prov = entry[0], items = entry[1];
+    const existing = orders.find(function(o) { return o.user === currentUser.key && o.provider === prov && o.date === dateStr; });
+    if (existing) {
+      items.forEach(function(newItem) {
+        const ex = existing.items.find(function(i) { return i.id === newItem.id; });
+        if (ex) ex.qty += newItem.qty;
+        else existing.items.push(newItem);
+      });
+      if (notes[prov]) existing.notes = (existing.notes ? existing.notes + ' / ' : '') + notes[prov];
+    } else {
+      orders.unshift({id: Date.now() + Math.random(), user: currentUser.key, userName: currentUser.name, provider: prov, date: dateStr, time: timeStr, notes: notes[prov] || '', items: items});
+    }
+  });
+  showLoadingOverlay(true);
+  await saveOrders();
+  showLoadingOverlay(false);
+  quantities = {}; notes = {};
+  renderOrder();
+  showToast('Pedido enviado correctamente');
+}
+
+// ADMIN ORDERS
+function renderAdminOrders() {
+  const grid = document.getElementById('ordersGrid');
+  const fp = document.getElementById('filterProvider').value;
+  const fw = document.getElementById('filterWeek').value;
+  const weekSel = document.getElementById('filterWeek');
+  const currentVal = weekSel.value;
+  const allWeeks = [];
+  orders.forEach(function(o) { if (allWeeks.indexOf(o.date) === -1) allWeeks.push(o.date); });
+  allWeeks.sort().reverse();
+  weekSel.innerHTML = '<option value="">Todas las semanas</option>';
+  allWeeks.forEach(function(w) {
+    const opt = document.createElement('option');
+    opt.value = w; opt.textContent = 'Semana ' + w;
+    if (w === currentVal) opt.selected = true;
+    weekSel.appendChild(opt);
+  });
+  if (!orders.length) {
+    grid.innerHTML = '<div class="empty-state"><div class="icon">clipboard</div><p>No hay pedidos registrados</p></div>';
+    return;
+  }
+  const consolidated = {};
+  orders.forEach(function(order) {
+    if (fp && order.provider !== fp) return;
+    if (fw && order.date !== fw) return;
+    const key = order.date + '||' + order.provider;
+    if (!consolidated[key]) consolidated[key] = {date: order.date, provider: order.provider, users: [], itemMap: {}, notesList: []};
+    const c = consolidated[key];
+    if (c.users.indexOf(order.userName) === -1) c.users.push(order.userName);
+    if (order.notes) c.notesList.push(order.userName.split(' ')[0] + ': ' + order.notes);
+    order.items.forEach(function(item) {
+      if (!c.itemMap[item.id]) c.itemMap[item.id] = Object.assign({}, item, {qty: 0, byUser: {}});
+      c.itemMap[item.id].qty += item.qty;
+      c.itemMap[item.id].byUser[order.userName] = (c.itemMap[item.id].byUser[order.userName] || 0) + item.qty;
+    });
+  });
+  const entries = Object.values(consolidated).sort(function(a,b) { return b.date.localeCompare(a.date); });
+  if (!entries.length) {
+    grid.innerHTML = '<div class="empty-state"><div class="icon">filter</div><p>No hay pedidos para este filtro</p></div>';
+    return;
+  }
+  grid.innerHTML = '';
+  entries.forEach(function(c, idx) {
+    const items = Object.values(c.itemMap).sort(function(a,b) {
+      if (a.t !== b.t) return TYPE_ORDER.indexOf(a.t) - TYPE_ORDER.indexOf(b.t);
+      return a.b.localeCompare(b.b);
+    });
+    const allUsers = c.users;
+    const total = items.reduce(function(s,i) { return s + (i.c || 0) * i.qty; }, 0);
+    const card = document.createElement('div');
+    card.className = 'order-card';
+    const userCols = allUsers.map(function(u) { return '<th style="color:#0071c2">' + u.split(' ')[0] + '</th>'; }).join('');
+    const itemRows = items.map(function(i) {
+      const uQtys = allUsers.map(function(u) {
+        return '<td style="text-align:center">' + (i.byUser[u] ? '<span class="qty-badge">' + i.byUser[u] + '</span>' : '<span style="color:#aaa">-</span>') + '</td>';
+      }).join('');
+      return '<tr><td style="color:#555;font-size:0.78rem">' + i.t + '</td><td style="font-weight:700">' + i.b + '</td><td style="color:#555">' + i.d + '</td>' +
+        '<td><span style="background:#003580;border-radius:4px;padding:2px 6px;font-size:0.7rem;color:#fff;font-weight:600">' + i.s + '</span></td>' +
+        uQtys +
+        '<td style="text-align:center"><span style="background:rgba(0,113,194,0.2);color:#0071c2;border-radius:6px;padding:2px 10px;font-weight:700">' + i.qty + '</span></td>' +
+        (total > 0 ? '<td style="color:#003580;font-weight:600">$' + ((i.c||0)*i.qty).toFixed(2) + '</td>' : '') +
+        '</tr>';
+    }).join('');
+    const notesHtml = c.notesList.length ? '<div style="margin-top:14px;padding:10px 14px;background:#f9f9f9;border:1px solid #e0e0e0;border-radius:8px;font-size:0.82rem;color:#555"><strong style="color:#003580">Notas:</strong> ' + c.notesList.join(' | ') + '</div>' : '';
+    card.innerHTML =
+      '<div class="order-card-header" onclick="toggleOrder(this)">' +
+      '<div class="order-card-title">' + pName(c.provider) + '</div>' +
+      '<div class="order-card-meta">' +
+      '<span class="badge badge-date">Sem. ' + c.date + '</span>' +
+      '<span class="badge badge-provider">' + items.length + ' productos</span>' +
+      allUsers.map(function(u) { return '<span class="badge badge-user">' + u.split(' ')[0] + '</span>'; }).join('') +
+      (total > 0 ? '<span class="badge" style="background:#e8f0fe;color:#003580;border:1px solid #c5d5f5">$' + total.toFixed(2) + '</span>' : '') +
+      '</div></div>' +
+      '<div class="order-card-body">' +
+      '<div style="overflow-x:auto"><table class="order-items-table"><thead><tr><th>Tipo</th><th>Marca</th><th>Descripcion</th><th>Tamano</th>' + userCols + '<th style="text-align:center">Total</th>' + (total > 0 ? '<th>Subtotal</th>' : '') + '</tr></thead><tbody>' + itemRows + '</tbody></table></div>' +
+      notesHtml +
+      '<button class="btn-export" onclick="exportConsolidated(' + idx + ')">Exportar Excel</button>' +
+      '</div>';
+    card.dataset.idx = idx;
+    grid.appendChild(card);
+  });
+  window._consolidatedEntries = entries;
+}
+
+function toggleOrder(header) { header.nextElementSibling.classList.toggle('open'); }
+
+function exportConsolidated(idx) {
+  const c = window._consolidatedEntries[idx];
+  if (!c) return;
+  const items = Object.values(c.itemMap).sort(function(a,b) {
+    if (a.t !== b.t) return TYPE_ORDER.indexOf(a.t) - TYPE_ORDER.indexOf(b.t);
+    return a.b.localeCompare(b.b);
+  });
+  const userCols = c.users.join('\t');
+  let csv = 'Proveedor\tFecha\tTipo\tMarca\tDescripcion\tTamano\tUnidad\t' + userCols + '\tTotal\tCosto\tSubtotal\n';
+  items.forEach(function(i) {
+    const uQtys = c.users.map(function(u) { return i.byUser[u] || 0; }).join('\t');
+    csv += pName(c.provider) + '\t' + c.date + '\t' + i.t + '\t' + i.b + '\t' + i.d + '\t' + i.s + '\t' + (i.u||'') + '\t' + uQtys + '\t' + i.qty + '\t' + (i.c||0) + '\t' + ((i.c||0)*i.qty).toFixed(2) + '\n';
+  });
+  if (c.notesList.length) csv += '\nNotas\t' + c.notesList.join(' | ') + '\n';
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (isMobile) {
+    navigator.clipboard.writeText(csv).then(function() {
+      showToast('Copiado al portapapeles - pega en Google Sheets o Numbers');
+    }).catch(function() {
+      const modal = document.createElement('div');
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px';
+      modal.innerHTML = '<div style="background:#fff;border-radius:10px;padding:24px;width:100%;max-width:480px"><div style="font-weight:700;color:#003580;margin-bottom:12px">Copiar Pedido</div><p style="font-size:0.82rem;color:#555;margin-bottom:10px">Selecciona todo y copia:</p><textarea readonly style="width:100%;height:200px;border:1px solid #ccc;border-radius:6px;font-size:0.72rem;padding:8px" onclick="this.select()">' + csv + '</textarea><button onclick="this.closest(\'div\').parentElement.remove()" style="margin-top:12px;width:100%;padding:12px;background:#0071c2;color:#fff;border:none;border-radius:6px;font-weight:600;cursor:pointer">Cerrar</button></div>';
+      document.body.appendChild(modal);
+    });
+  } else {
+    const blob = new Blob([csv], {type: 'text/tab-separated-values'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'pedido_' + c.provider + '_' + c.date + '.xls';
+    a.click();
+  }
+}
+
+// ADMIN PRODUCTS
+function renderAdminProducts() {
+  document.getElementById('productCount').textContent = products.filter(function(p){return p.a;}).length + ' activos - ' + products.length + ' total';
+  const tbody = document.getElementById('productsBody');
+  tbody.innerHTML = '';
+  const sorted = products.slice().sort(function(a,b) {
+    if (a.p !== b.p) return a.p.localeCompare(b.p);
+    if (TYPE_ORDER.indexOf(a.t) !== TYPE_ORDER.indexOf(b.t)) return TYPE_ORDER.indexOf(a.t) - TYPE_ORDER.indexOf(b.t);
+    return a.b.localeCompare(b.b);
+  });
+  sorted.forEach(function(prod) {
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td><span class="active-dot ' + (prod.a ? 'on' : 'off') + '"></span></td>' +
+      '<td style="color:#555;font-size:0.8rem">' + pName(prod.p) + '</td>' +
+      '<td style="color:#0071c2;font-size:0.8rem">' + prod.t + '</td>' +
+      '<td style="font-weight:700">' + prod.b + '</td>' +
+      '<td style="color:#555">' + prod.d + '</td>' +
+      '<td><span style="background:#003580;border-radius:4px;padding:2px 7px;font-size:0.72rem;color:#fff;font-weight:600">' + prod.s + '</span></td>' +
+      '<td style="color:#555;font-size:0.8rem">' + (prod.u || '-') + '</td>' +
+      '<td style="color:#003580;font-weight:600">' + (prod.c > 0 ? '$' + prod.c.toFixed(2) : '-') + '</td>' +
+      '<td><button class="btn-edit" onclick="openProductModal(' + prod.id + ')">Editar</button><button class="btn-delete" onclick="toggleActive(' + prod.id + ')">' + (prod.a ? 'Desactivar' : 'Activar') + '</button></td>';
+    tbody.appendChild(tr);
+  });
+}
+
+async function toggleActive(id) {
+  const p = products.find(function(x) { return x.id === id; });
+  if (p) { p.a = !p.a; await saveProducts(); renderAdminProducts(); }
+}
+
+function openProductModal(id) {
+  editingProductId = id || null;
+  document.getElementById('modalTitle').textContent = id ? 'Editar Producto' : 'Agregar Producto';
+  if (id) {
+    const p = products.find(function(x) { return x.id === id; });
+    document.getElementById('mpProvider').value = p.p;
+    document.getElementById('mpType').value = p.t;
+    document.getElementById('mpBrand').value = p.b;
+    document.getElementById('mpDesc').value = p.d;
+    document.getElementById('mpSize').value = p.s;
+    document.getElementById('mpUnit').value = p.u || 'Caja';
+    document.getElementById('mpCost').value = p.c || '';
+  } else {
+    document.getElementById('mpProvider').value = SG;
+    document.getElementById('mpType').value = 'Tequila';
+    document.getElementById('mpUnit').value = 'Caja';
+    ['mpBrand','mpDesc','mpSize','mpCost'].forEach(function(fid) { document.getElementById(fid).value = ''; });
+  }
+  document.getElementById('productModal').classList.add('open');
+}
+
+function closeProductModal() { document.getElementById('productModal').classList.remove('open'); }
+
+async function saveProduct() {
+  const brand = document.getElementById('mpBrand').value.trim().toUpperCase();
+  const desc  = document.getElementById('mpDesc').value.trim().toUpperCase();
+  const size  = document.getElementById('mpSize').value.trim().toUpperCase();
+  if (!brand || !desc || !size) { showToast('Completa todos los campos'); return; }
+  const data = {
+    p: document.getElementById('mpProvider').value,
+    t: document.getElementById('mpType').value,
+    b: brand, d: desc, s: size,
+    u: document.getElementById('mpUnit').value,
+    c: parseFloat(document.getElementById('mpCost').value) || 0,
+    a: true
+  };
+  if (editingProductId) {
+    const idx = products.findIndex(function(p) { return p.id === editingProductId; });
+    products[idx] = Object.assign({}, products[idx], data);
+  } else {
+    products.push(Object.assign({id: nextId++}, data));
+  }
+  await saveProducts();
+  closeProductModal();
+  renderAdminProducts();
+  showToast(editingProductId ? 'Producto actualizado' : 'Producto agregado');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 3000);
+}
+</script>
+</body>
+</html>
