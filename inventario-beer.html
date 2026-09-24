@@ -126,7 +126,7 @@ tr.sect td{font-family:var(--display);font-size:16px;text-transform:uppercase;le
 .calc-fab svg{width:18px;height:18px}
 .calc{position:fixed;right:16px;bottom:calc(72px + env(safe-area-inset-bottom,0px));z-index:21;width:min(300px,calc(100vw - 32px));background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.25);display:grid;gap:8px}
 .calc-top{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
-.calc-top button{padding:2px 10px}
+.calc-close{padding:8px 16px!important;font-size:15px;font-weight:700;background:var(--warn);border-color:var(--warn);color:#fff;border-radius:999px;letter-spacing:0;text-transform:none}
 .calc-disp{background:var(--panel-2);border-radius:8px;padding:8px 12px;text-align:right;font-variant-numeric:tabular-nums;min-height:64px;overflow-wrap:anywhere}
 .calc-expr{font-size:13px;color:var(--muted);min-height:18px}
 .calc-res{font-family:var(--display);font-size:30px;font-weight:600}
@@ -155,7 +155,9 @@ tr.sect td{font-family:var(--display);font-size:16px;text-transform:uppercase;le
 .help h2{font-family:var(--display);text-transform:uppercase;font-size:22px;margin:0;letter-spacing:.03em}
 .steps{margin:14px 0 0;padding-left:0;list-style:none;counter-reset:st;display:grid;gap:12px}
 .steps li{counter-increment:st;position:relative;padding-left:40px;line-height:1.45;min-height:28px}
-.steps li::before{content:counter(st);position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-family:var(--display);font-weight:700}
+.steps li::before{content:counter(st);position:absolute;left:0;top:-2px;width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-family:var(--display);font-weight:700}
+.kw{display:block;font-family:var(--display);font-weight:700;font-size:18px;letter-spacing:.06em;line-height:1.2;margin-bottom:2px}
+.kw-opt{color:var(--muted)}
 .t-ref{color:var(--ref)} .t-bar{color:var(--bar)} .t-bod{color:var(--bod)}
 .tips{margin-top:16px;padding:12px 14px;border-radius:10px;background:var(--panel-2);font-size:14px}
 .tips ul{margin:6px 0 0;padding-left:18px;display:grid;gap:4px}
@@ -177,7 +179,7 @@ tr.sect td{font-family:var(--display);font-size:16px;text-transform:uppercase;le
   <header class="top">
     <div class="brand">
       <h1>La Resaca <span>Calexico</span> · Inventario</h1>
-      <div class="brand-r"><button type="button" class="helpbtn" id="btnHelp" aria-controls="help">📋 Pasos</button><div class="sync" id="sync"><i class="dot" id="syncDot"></i><span id="syncTxt">Conectando…</span></div></div>
+      <div class="brand-r"><button type="button" class="helpbtn" id="btnHelp" aria-controls="help">📋 Guía</button><div class="sync" id="sync"><i class="dot" id="syncDot"></i><span id="syncTxt">Conectando…</span></div></div>
     </div>
     <div class="meta">
       <button class="newbtn" id="btnNew" type="button">+ Nueva forma</button>
@@ -186,7 +188,8 @@ tr.sect td{font-family:var(--display);font-size:16px;text-transform:uppercase;le
     </div>
     <div class="dialog" id="newDlg" hidden>
       <div class="rowb">
-        <div class="field" style="flex:1"><label for="inpNewDate">Fecha del inventario (obligatoria)</label><input type="date" id="inpNewDate"></div>
+        <div class="field" style="flex:1;min-width:150px"><label for="inpNewDate">Fecha del inventario</label><input type="date" id="inpNewDate"></div>
+        <div class="field" style="flex:1;min-width:150px"><label for="inpNewName">Tu nombre (responsable)</label><input type="text" id="inpNewName" placeholder="Nombre" autocomplete="off"></div>
         <button class="primary" id="btnCreate" type="button">Crear inventario</button>
         <button id="btnCancelNew" type="button">Cancelar</button>
       </div>
@@ -208,29 +211,28 @@ tr.sect td{font-family:var(--display);font-size:16px;text-transform:uppercase;le
 
 <div class="help-back" id="help" hidden>
  <div class="help" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
-  <div class="help-head"><h2 id="helpTitle">Pasos para Toma de Inventario</h2><button type="button" id="btnHelpClose">Cerrar</button></div>
+  <div class="help-head"><h2 id="helpTitle">Guía para Toma de Inventario</h2><button type="button" id="btnHelpClose" class="calc-close">✕ Cerrar</button></div>
   <ol class="steps">
-   <li><b>Crea la forma del día.</b> Toca <b>+ Nueva forma</b>, elige la <b>fecha</b> del conteo y toca <b>Crear inventario</b>. Si esa fecha ya existe, la app abre la que ya está.</li>
-   <li><b>Escribe tu nombre</b> en <b>Responsable</b>.</li>
-   <li><b>Empieza por <span class="t-ref">REFRI</span></b> (azul). En cada producto escribe <b>Cajas</b> y <b>Sueltas</b>; la app calcula el total sola (1 caja de botella = 24, 1 caja de caguama = 12). Deja en blanco lo que no haya.</li>
-   <li><b>Si el mismo producto está en varios lugares,</b> súmalo en la casilla: escribe <b>3+2+1</b> y se guarda 6. También puedes usar la <b>Calculadora</b> (abajo a la derecha): toca la casilla, haz la cuenta y toca <b>Poner en la casilla</b>.</li>
-   <li><b>Sigue con <span class="t-bar">BAR</span></b> (naranja, el refrigerador de atrás) y luego <b><span class="t-bod">BODEGA</span></b> (verde). El color te indica en qué área estás capturando.</li>
-   <li><b>Revisa en RESUMEN</b> los totales por producto y por área. Marca <b>Solo con conteo</b> en cada área para revisar rápido lo que capturaste.</li>
-   <li><b>Envía el inventario.</b> En Resumen toca <b>Enviar inventario</b> y luego <b>Sí, enviar</b>. Después de enviarlo ya <b>no se puede modificar</b>.</li>
-   <li><b>(Opcional)</b> Toca <b>Bajar a Excel</b>, al final de la forma, para descargar el conteo.</li>
+   <li><span class="kw">CREA</span> Toca <b>+ Nueva forma</b>, elige la <b>fecha</b>, escribe <b>tu nombre</b> y toca <b>Crear inventario</b>. Arriba, en <b>Fecha del inventario</b>, debe salir la fecha con tu nombre. Si ya tienes una forma abierta de ese día, la app abre la tuya.</li>
+   <li><span class="kw">CUENTA</span> Empieza en <b class="t-ref">REFRI</b> (azul). En cada producto escribe <b>solo números</b>: en la casilla <b>Cajas</b> pon cuántas cajas completas hay, y en la casilla <b>Sueltas</b> cuántas botellas sueltas hay. <br><i>Ejemplo: si hay 2 cajas y 5 botellas sueltas, escribe <b>2</b> en Cajas y <b>5</b> en Sueltas.</i><br>La app calcula el total sola (1 caja de botella = 24, 1 caja de caguama = 12). Si no hay nada de un producto, déjalo en blanco.</li>
+   <li><span class="kw">SUMA</span> Si un producto está en varios lugares, toca su casilla, abre la <b>Calculadora</b> (abajo a la derecha), haz la suma (ej. 3 + 2 + 1 =) y toca <b>Poner en la casilla</b>.</li>
+   <li><span class="kw">UBICACIÓN</span> Sigue con <b class="t-bar">BAR</b> (naranja, el refrigerador de atrás) y luego <b class="t-bod">BODEGA</b> (verde). El color te indica en qué área estás capturando.</li>
+   <li><span class="kw">REVISA</span> En el tab <b>Resumen</b>, revisa los totales por producto y por área. Si quieres ver solo lo que tiene capturas, marca <b>Solo con conteo</b> en cada área.</li>
+   <li><span class="kw">ENVÍA</span> En el tab <b>Resumen</b> toca <b>Enviar inventario</b> y luego <b>Sí, enviar</b>. Después de enviarlo ya <b>no se puede modificar</b>.</li>
+   <li><span class="kw kw-opt">EXCEL · solo admin (opcional)</span> El admin puede tocar <b>Bajar a Excel</b>, al final de la forma, para descargar el conteo.</li>
   </ol>
   <div class="tips"><b>Bueno saber</b>
    <ul>
     <li>Todo se guarda solo. Arriba verás <span class="okdot"></span> <b>Guardado</b> / <b>Al día</b>.</li>
     <li>Si aparece <b>Sin conexión</b>, no cierres la app hasta que vuelva a decir Guardado.</li>
-    <li>Varias personas pueden contar al mismo tiempo, cada una en un área distinta.</li>
+    <li>Cada toma de inventario tiene <b>un solo responsable</b>. Puede haber varias tomas el mismo día, cada una con su propio responsable y su propia forma.</li>
     <li>Si ya enviaste y hay un error, avisa a Jose (admin) para que lo reabra.</li>
    </ul></div>
  </div>
 </div>
 <button class="calc-fab" id="calcFab" type="button" aria-expanded="false" aria-controls="calc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 19h.01M12 19h.01M16 19h.01"/></svg>Calculadora</button>
 <div class="calc" id="calc" hidden>
-  <div class="calc-top"><span>Calculadora</span><button type="button" id="calcClose">Cerrar</button></div>
+  <div class="calc-top"><span>Calculadora</span><button type="button" id="calcClose" class="calc-close" aria-label="Cerrar calculadora">✕ Cerrar</button></div>
   <div class="calc-disp"><div class="calc-expr" id="calcExpr"></div><div class="calc-res" id="calcRes">0</div></div>
   <div class="calc-keys" id="calcKeys">
     <button type="button" data-k="C" class="op">C</button><button type="button" data-k="back" class="op">⌫</button><button type="button" data-k="/" class="op">÷</button><button type="button" data-k="*" class="op">×</button>
@@ -244,11 +246,13 @@ tr.sect td{font-family:var(--display);font-size:16px;text-transform:uppercase;le
 </div>
 <script>
 const CATALOGO=[{"id": "b_805_lima_limon", "nombre": "805 Lima/Limón", "tipo": "botella"}, {"id": "b_bud_light", "nombre": "Bud Light", "tipo": "botella"}, {"id": "b_budweiser_botella", "nombre": "Budweiser (botella)", "tipo": "botella"}, {"id": "b_coors_light", "nombre": "Coors Light", "tipo": "botella"}, {"id": "b_corona_cero", "nombre": "Corona Cero", "tipo": "botella"}, {"id": "b_corona_extra", "nombre": "Corona Extra", "tipo": "botella"}, {"id": "b_dos_equis", "nombre": "Dos Equis", "tipo": "botella"}, {"id": "b_estrella_jalisco", "nombre": "Estrella Jalisco", "tipo": "botella"}, {"id": "b_heineken_zero", "nombre": "Heineken Zero", "tipo": "botella"}, {"id": "b_indio", "nombre": "Indio", "tipo": "botella"}, {"id": "b_lagunitas", "nombre": "Lagunitas", "tipo": "botella"}, {"id": "b_michelob_ultra", "nombre": "Michelob Ultra", "tipo": "botella"}, {"id": "b_michelob_ultra_gold", "nombre": "Michelob Ultra Gold", "tipo": "botella"}, {"id": "b_michelob_ultra_zero", "nombre": "Michelob Ultra Zero", "tipo": "botella"}, {"id": "b_miller_lite", "nombre": "Miller Lite", "tipo": "botella"}, {"id": "b_modelo_especial", "nombre": "Modelo Especial", "tipo": "botella"}, {"id": "b_modelo_negra", "nombre": "Modelo Negra", "tipo": "botella"}, {"id": "b_modelo_oro", "nombre": "Modelo Oro", "tipo": "botella"}, {"id": "b_pacifico", "nombre": "Pacifico", "tipo": "botella"}, {"id": "b_stella_artois", "nombre": "Stella Artois", "tipo": "botella"}, {"id": "b_tecate_light", "nombre": "Tecate Light", "tipo": "botella"}, {"id": "b_tecate_roja", "nombre": "Tecate Roja", "tipo": "botella"}, {"id": "c_bud_light", "nombre": "Bud Light", "tipo": "caguama"}, {"id": "c_budweiser", "nombre": "Budweiser", "tipo": "caguama"}, {"id": "c_carta_blanca", "nombre": "Carta Blanca", "tipo": "caguama"}, {"id": "c_dos_equis", "nombre": "Dos Equis", "tipo": "caguama"}, {"id": "c_m_ultra", "nombre": "M. Ultra", "tipo": "caguama"}, {"id": "c_miller_high_life", "nombre": "Miller High Life", "tipo": "caguama"}, {"id": "c_modelo", "nombre": "Modelo", "tipo": "caguama"}, {"id": "c_pacifico", "nombre": "Pacifico", "tipo": "caguama"}, {"id": "c_tecate_roja", "nombre": "Tecate Roja", "tipo": "caguama"}, {"id": "c_victoria", "nombre": "Victoria", "tipo": "caguama"}];
-const SEED={"2026-09-24":{responsable:"",conteos:{"b_805_lima_limon": {"bar": {"c": 0, "s": 3}, "ref": {"c": 0, "s": 7}}, "b_bud_light": {"bod": {"c": 6, "s": 18}, "bar": {"c": 0, "s": 11}, "ref": {"c": 0, "s": 18}}, "b_budweiser_botella": {"bod": {"c": 2, "s": 6}, "bar": {"c": 0, "s": 9}, "ref": {"c": 0, "s": 8}}, "b_coors_light": {"bod": {"c": 1, "s": 12}, "bar": {"c": 0, "s": 6}, "ref": {"c": 0, "s": 7}}, "b_corona_cero": {"bar": {"c": 0, "s": 1}, "ref": {"c": 0, "s": 5}}, "b_corona_extra": {"ref": {"c": 0, "s": 5}}, "b_dos_equis": {"bod": {"c": 0, "s": 19}, "bar": {"c": 0, "s": 6}, "ref": {"c": 0, "s": 10}}, "b_estrella_jalisco": {"bar": {"c": 0, "s": 6}, "ref": {"c": 0, "s": 6}}, "b_indio": {"bod": {"c": 0, "s": 6}, "bar": {"c": 0, "s": 7}, "ref": {"c": 0, "s": 13}}, "b_lagunitas": {"ref": {"c": 0, "s": 1}}, "b_michelob_ultra": {"bod": {"c": 10, "s": 0}, "bar": {"c": 0, "s": 12}, "ref": {"c": 0, "s": 17}}, "b_michelob_ultra_gold": {"bod": {"c": 3, "s": 6}, "bar": {"c": 0, "s": 8}, "ref": {"c": 0, "s": 12}}, "b_michelob_ultra_zero": {"bod": {"c": 0, "s": 18}, "ref": {"c": 0, "s": 5}}, "b_miller_lite": {"bod": {"c": 1, "s": 6}, "bar": {"c": 0, "s": 7}, "ref": {"c": 0, "s": 12}}, "b_modelo_especial": {"bod": {"c": 0, "s": 12}, "bar": {"c": 0, "s": 7}, "ref": {"c": 0, "s": 6}}, "b_modelo_negra": {"bod": {"c": 0, "s": 24}, "bar": {"c": 0, "s": 9}, "ref": {"c": 0, "s": 8}}, "b_modelo_oro": {"bar": {"c": 0, "s": 1}}, "b_pacifico": {"bod": {"c": 0, "s": 48}, "bar": {"c": 0, "s": 7}, "ref": {"c": 0, "s": 12}}, "b_stella_artois": {"bod": {"c": 0, "s": 30}, "bar": {"c": 0, "s": 6}, "ref": {"c": 0, "s": 12}}, "b_tecate_light": {"bod": {"c": 0, "s": 27}, "bar": {"c": 0, "s": 13}, "ref": {"c": 0, "s": 15}}, "b_tecate_roja": {"bod": {"c": 0, "s": 74}, "bar": {"c": 0, "s": 6}, "ref": {"c": 0, "s": 8}}, "c_bud_light": {"bod": {"c": 3, "s": 1}, "bar": {"c": 0, "s": 3}, "ref": {"c": 0, "s": 4}}, "c_budweiser": {"bod": {"c": 2, "s": 7}, "bar": {"c": 0, "s": 4}, "ref": {"c": 0, "s": 3}}, "c_carta_blanca": {"bod": {"c": 0, "s": 8}, "ref": {"c": 0, "s": 3}}, "c_dos_equis": {"bod": {"c": 0, "s": 1}, "bar": {"c": 0, "s": 4}, "ref": {"c": 0, "s": 4}}, "c_m_ultra": {"bod": {"c": 0, "s": 23}, "bar": {"c": 0, "s": 5}, "ref": {"c": 0, "s": 5}}, "c_miller_high_life": {"bod": {"c": 0, "s": 4}, "bar": {"c": 0, "s": 4}, "ref": {"c": 0, "s": 3}}, "c_modelo": {"bar": {"c": 0, "s": 10}}, "c_pacifico": {"bar": {"c": 0, "s": 2}, "ref": {"c": 0, "s": 4}}, "c_tecate_roja": {"bod": {"c": 0, "s": 10}, "bar": {"c": 0, "s": 8}, "ref": {"c": 0, "s": 3}}}}};
+const SEED={"2026-09-24":{responsable:"Jose",conteos:{"b_805_lima_limon": {"bar": {"c": 0, "s": 3}, "ref": {"c": 0, "s": 7}}, "b_bud_light": {"bod": {"c": 6, "s": 18}, "bar": {"c": 0, "s": 11}, "ref": {"c": 0, "s": 18}}, "b_budweiser_botella": {"bod": {"c": 2, "s": 6}, "bar": {"c": 0, "s": 9}, "ref": {"c": 0, "s": 8}}, "b_coors_light": {"bod": {"c": 1, "s": 12}, "bar": {"c": 0, "s": 6}, "ref": {"c": 0, "s": 7}}, "b_corona_cero": {"bar": {"c": 0, "s": 1}, "ref": {"c": 0, "s": 5}}, "b_corona_extra": {"ref": {"c": 0, "s": 5}}, "b_dos_equis": {"bod": {"c": 0, "s": 19}, "bar": {"c": 0, "s": 6}, "ref": {"c": 0, "s": 10}}, "b_estrella_jalisco": {"bar": {"c": 0, "s": 6}, "ref": {"c": 0, "s": 6}}, "b_indio": {"bod": {"c": 0, "s": 6}, "bar": {"c": 0, "s": 7}, "ref": {"c": 0, "s": 13}}, "b_lagunitas": {"ref": {"c": 0, "s": 1}}, "b_michelob_ultra": {"bod": {"c": 10, "s": 0}, "bar": {"c": 0, "s": 12}, "ref": {"c": 0, "s": 17}}, "b_michelob_ultra_gold": {"bod": {"c": 3, "s": 6}, "bar": {"c": 0, "s": 8}, "ref": {"c": 0, "s": 12}}, "b_michelob_ultra_zero": {"bod": {"c": 0, "s": 18}, "ref": {"c": 0, "s": 5}}, "b_miller_lite": {"bod": {"c": 1, "s": 6}, "bar": {"c": 0, "s": 7}, "ref": {"c": 0, "s": 12}}, "b_modelo_especial": {"bod": {"c": 0, "s": 12}, "bar": {"c": 0, "s": 7}, "ref": {"c": 0, "s": 6}}, "b_modelo_negra": {"bod": {"c": 0, "s": 24}, "bar": {"c": 0, "s": 9}, "ref": {"c": 0, "s": 8}}, "b_modelo_oro": {"bar": {"c": 0, "s": 1}}, "b_pacifico": {"bod": {"c": 0, "s": 48}, "bar": {"c": 0, "s": 7}, "ref": {"c": 0, "s": 12}}, "b_stella_artois": {"bod": {"c": 0, "s": 30}, "bar": {"c": 0, "s": 6}, "ref": {"c": 0, "s": 12}}, "b_tecate_light": {"bod": {"c": 0, "s": 27}, "bar": {"c": 0, "s": 13}, "ref": {"c": 0, "s": 15}}, "b_tecate_roja": {"bod": {"c": 0, "s": 74}, "bar": {"c": 0, "s": 6}, "ref": {"c": 0, "s": 8}}, "c_bud_light": {"bod": {"c": 3, "s": 1}, "bar": {"c": 0, "s": 3}, "ref": {"c": 0, "s": 4}}, "c_budweiser": {"bod": {"c": 2, "s": 7}, "bar": {"c": 0, "s": 4}, "ref": {"c": 0, "s": 3}}, "c_carta_blanca": {"bod": {"c": 0, "s": 8}, "ref": {"c": 0, "s": 3}}, "c_dos_equis": {"bod": {"c": 0, "s": 1}, "bar": {"c": 0, "s": 4}, "ref": {"c": 0, "s": 4}}, "c_m_ultra": {"bod": {"c": 0, "s": 23}, "bar": {"c": 0, "s": 5}, "ref": {"c": 0, "s": 5}}, "c_miller_high_life": {"bod": {"c": 0, "s": 4}, "bar": {"c": 0, "s": 4}, "ref": {"c": 0, "s": 3}}, "c_modelo": {"bar": {"c": 0, "s": 10}}, "c_pacifico": {"bar": {"c": 0, "s": 2}, "ref": {"c": 0, "s": 4}}, "c_tecate_roja": {"bod": {"c": 0, "s": 10}, "bar": {"c": 0, "s": 8}, "ref": {"c": 0, "s": 3}}}}};
 const TIENDA="calexico";
 // Contraseña de admin guardada como huella SHA-256 (no en texto). Para cambiarla pide un nuevo valor.
 const ADMIN_HASH="639b723c3f6b7f3c649e46f7b09025454f2facf03f58efe06e4c049cbf7038de";
-const docId=f=>"inv_"+TIENDA+"_"+f;
+const PREFIX="inv_"+TIENDA+"_";
+const docId=k=>PREFIX+k;
+const slugName=t=>t.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40)||"sin-nombre";
 const LOCS={bod:"Bodega",bar:"Bar (Refrigerador atrás)",ref:"Refrigerador"};
 const PER={botella:24,caguama:12};
 let db=null, COL=null, canWrite=true, catalog=null, invList=[], curId=null, curDoc=null, unsubDoc=null, loc="ref", hideEmpty=false;
@@ -297,13 +301,13 @@ function render(){
       if(hideEmpty&&!t)continue;
       h+=`<div class="row ${t?"has":""}" data-pid="${p.id}">
         <div class="name">${esc(p.nombre)}</div>
-        <input class="num cajas" id="c-${p.id}" data-f="c" inputmode="decimal" value="${x.c||""}" placeholder="0" aria-label="${esc(p.nombre)} cajas" ${canWrite&&!isLocked()?"":"disabled"}>
-        <input class="num" id="s-${p.id}" data-f="s" inputmode="decimal" value="${x.s||""}" placeholder="0" aria-label="${esc(p.nombre)} sueltas" ${canWrite&&!isLocked()?"":"disabled"}>
+        <input class="num cajas" id="c-${p.id}" data-f="c" inputmode="numeric" pattern="[0-9]*" value="${x.c||""}" placeholder="0" aria-label="${esc(p.nombre)} cajas" ${canWrite&&!isLocked()?"":"disabled"}>
+        <input class="num" id="s-${p.id}" data-f="s" inputmode="numeric" pattern="[0-9]*" value="${x.s||""}" placeholder="0" aria-label="${esc(p.nombre)} sueltas" ${canWrite&&!isLocked()?"":"disabled"}>
         <div class="tot">${t}</div></div>`;
     }
     h+=`</section>`;
   }
-  h+=`<p class="note">Los cambios se guardan solos y los ven todos al instante. Puedes sumar directo en la casilla: escribe 3+1+5 y se guarda 9. También tienes la calculadora abajo a la derecha.</p>
+  h+=`<p class="note">Los cambios se guardan solos y los ven todos al instante. Para sumar un producto que está en varios lugares, toca la casilla y usa la <b>Calculadora</b> (abajo a la derecha).</p>
   <div class="actions endx"><button class="primary xlsbtn" id="btnXlsxTop" type="button">Bajar a Excel</button></div>`;
   main.innerHTML=h;
 }
@@ -339,7 +343,7 @@ function renderSummary(main){
   </div>`}
   <p class="note">Fecha del conteo: ${fmtDate(curDoc.fecha)} · Responsable: ${esc(curDoc.responsable||"—")} · Última modificación: ${upd}</p>
   <p class="note" id="xlsxMsg"></p>
-  <section class="group"><div class="ghead"><h2>Historial por fecha</h2><span class="rule">${invList.length} inventario${invList.length===1?"":"s"}</span></div>
+  <section class="group"><div class="ghead"><h2>Historial de conteos</h2><span class="rule">${invList.length} inventario${invList.length===1?"":"s"}</span></div>
   <div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Responsable</th><th>Botellas</th><th>Caguamas</th><th style="text-align:left">Estado</th><th></th></tr></thead><tbody>
   ${invList.map(i=>`<tr${i.id===curId?' style="background:var(--accent-soft)"':''}><td>${fmtDate(i.fecha)}</td><td style="text-align:left">${esc(i.data.responsable||"—")}</td><td>${docTot(i.data,"botella")}</td><td>${docTot(i.data,"caguama")}</td><td style="text-align:left">${i.data.estado==="enviado"?"Enviado":"Abierto"}</td><td>${i.id===curId?"Abierto":`<button type="button" data-open="${i.id}">Abrir</button>`}</td></tr>`).join("")}
   </tbody></table></div>
@@ -352,7 +356,7 @@ function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt
 
 function renderSelect(){
   const sel=$("#selInv");
-  sel.innerHTML=invList.length?invList.map(d=>`<option value="${d.id}">${fmtDate(d.fecha)}</option>`).join(""):`<option value="">Sin inventarios</option>`;
+  sel.innerHTML=invList.length?invList.map(d=>`<option value="${d.id}">${fmtDate(d.fecha)} · ${esc(d.data.responsable||"sin nombre")}${d.data.estado==="enviado"?" · Enviado":""}</option>`).join(""):`<option value="">Sin inventarios</option>`;
   if(curId)sel.value=curId;
 }
 
@@ -440,16 +444,19 @@ $("#inpResp").addEventListener("change",async e=>{
   try{await COL.doc(docId(curId)).update({responsable:e.target.value.trim(),actualizado:new Date().toISOString()});setSync("ok","Guardado")}catch(err){setSync("err","No se pudo guardar")}
 });
 $("#selInv").addEventListener("change",e=>{flushNow();openInv(e.target.value)});
-$("#btnNew").addEventListener("click",()=>{$("#newDlg").hidden=!$("#newDlg").hidden;$("#inpNewDate").value=todayISO();$("#newMsg").textContent=""});
+$("#btnNew").addEventListener("click",()=>{$("#newDlg").hidden=!$("#newDlg").hidden;$("#inpNewDate").value=todayISO();$("#inpNewName").value="";$("#newMsg").textContent="";$("#inpNewName").focus()});
 $("#btnCancelNew").addEventListener("click",()=>{$("#newDlg").hidden=true});
 $("#btnCreate").addEventListener("click",async()=>{
   const f=$("#inpNewDate").value;if(!/^\d{4}-\d{2}-\d{2}$/.test(f)){$("#newMsg").textContent="Elige una fecha.";return}
-  if(invList.some(d=>d.id===f)){$("#newMsg").textContent="Ya existe un inventario con esa fecha. Lo abrí para que lo revises.";openInv(f);return}
+  const name=$("#inpNewName").value.trim();if(!name){$("#newMsg").textContent="Escribe tu nombre.";$("#inpNewName").focus();return}
+  const same=invList.find(d=>d.fecha===f&&slugName(d.data.responsable||"")===slugName(name)&&d.data.estado!=="enviado");
+  if(same){$("#newMsg").textContent=`Ya tienes una forma abierta del ${fmtDate(f)}. La abrí para que sigas capturando.`;openInv(same.id);return}
+  let key=f+"_"+slugName(name),i=2;while(invList.some(d=>d.id===key))key=f+"_"+slugName(name)+"-"+(i++);
   $("#btnCreate").disabled=true;
   try{
     const now=new Date().toISOString();
-    await COL.doc(docId(f)).set({tipo:"inventario-cerveza",tienda:TIENDA,fecha:f,responsable:$("#inpResp").value.trim(),conteos:{},creado:now,actualizado:now});
-    $("#newDlg").hidden=true;loc="ref";openInv(f);
+    await COL.doc(docId(key)).set({tipo:"inventario-cerveza",tienda:TIENDA,fecha:f,responsable:name,conteos:{},creado:now,actualizado:now});
+    $("#newDlg").hidden=true;loc="ref";openInv(key);
   }catch(e){$("#newMsg").textContent="No se pudo crear. Revisa tu conexión e intenta de nuevo."}
   $("#btnCreate").disabled=false;
 });
@@ -504,16 +511,17 @@ async function exportXlsx(docs){
     const ws=XLSX.utils.aoa_to_sheet(aoa);
     ws["!cols"]=[{wch:26},...Array(9).fill({wch:8}),{wch:9}];
     ws["!merges"]=[{s:{r:0,c:0},e:{r:0,c:10}},{s:{r:2,c:1},e:{r:2,c:3}},{s:{r:2,c:4},e:{r:2,c:6}},{s:{r:2,c:7},e:{r:2,c:9}}];
-    const [y,m,dd]=d.fecha.split("-");XLSX.utils.book_append_sheet(wb,ws,`Calexico ${dd}-${m}-${y}`);
+    const [y,m,dd]=d.fecha.split("-");let nm=`${dd}-${m}-${y} ${(d.responsable||"").replace(/[\\/?*\[\]:]/g,"")}`.trim().slice(0,31),j=2;
+    while(wb.SheetNames.includes(nm))nm=nm.slice(0,28)+" "+(j++);XLSX.utils.book_append_sheet(wb,ws,nm);
   }
-  const name=docs.length===1?`Inventario_Clx_${docs[0].fecha}.xlsx`:`Inventario_Clx_Historial.xlsx`;
+  const name=docs.length===1?`Inventario_Clx_${docs[0].fecha}_${slugName(docs[0].responsable||"")}.xlsx`:`Inventario_Clx_Historial.xlsx`;
   XLSX.writeFile(wb,name);msg.textContent="Excel descargado.";
 }
 
 /* ---------- calculadora ---------- */
 let cExpr="", lastInput=null;
 const opsRe=/[+\-*/]/;
-function cEval(e){if(!/^[\d.+\-*/]+$/.test(e))return null;e=e.replace(/[+\-*/.]+$/,"");if(!e)return 0;try{const v=Function('"use strict";return ('+e+')')();return Number.isFinite(v)?Math.round(v*1000)/1000:null}catch(_){return null}}
+function cEval(e){if(!e)return 0;if(!/^[\d.+\-*/]+$/.test(e))return null;e=e.replace(/[+\-*/.]+$/,"");if(!e)return 0;try{const v=Function('"use strict";return ('+e+')')();return Number.isFinite(v)?Math.round(v*1000)/1000:null}catch(_){return null}}
 function cShow(){const pretty=cExpr.replace(/\*/g,"×").replace(/\//g,"÷").replace(/-/g,"−");$("#calcExpr").textContent=pretty;const v=cEval(cExpr);$("#calcRes").textContent=v===null?"Error":v;
   const ok=!isLocked()&&lastInput&&document.body.contains(lastInput)&&!lastInput.disabled&&v!==null&&v>=0;$("#calcUse").disabled=!ok;
   $("#calcHint").textContent=lastInput&&document.body.contains(lastInput)?`Casilla: ${lastInput.getAttribute("aria-label")}`:"Toca una casilla de Cajas o Sueltas y luego “Poner en la casilla”."}
@@ -542,7 +550,7 @@ async function start(){
   // one-time load of the 24-sep count captured from the dictation
   for(const f in SEED){try{const r=COL.doc(docId(f));const s=await r.get();if(!s.exists){const now=new Date().toISOString();await r.set({tipo:"inventario-cerveza",tienda:TIENDA,fecha:f,...SEED[f],creado:now,actualizado:now})}}catch(e){console.error(e)}}
   COL.where("tipo","==","inventario-cerveza").onSnapshot(s=>{
-    invList=s.docs.map(d=>d.data()).filter(d=>d.tienda===TIENDA).map(d=>({id:d.fecha,fecha:d.fecha,data:d})).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+    invList=s.docs.filter(d=>d.data().tienda===TIENDA&&d.id.startsWith(PREFIX)).map(d=>({id:d.id.slice(PREFIX.length),fecha:d.data().fecha,data:d.data()})).sort((a,b)=>b.fecha.localeCompare(a.fecha)||String(b.data.creado||"").localeCompare(String(a.data.creado||"")));
     renderSelect();
     const ls=JSON.stringify(invList.map(i=>[i.id,i.data.estado,docTot(i.data,"botella"),docTot(i.data,"caguama")]));
     if(loc==="sum"&&curDoc&&ls!==listSig&&!sendOpen)render();listSig=ls;
