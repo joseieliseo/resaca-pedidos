@@ -143,6 +143,19 @@ tr.sect td{font-family:var(--display);font-size:16px;text-transform:uppercase;le
 .adminbox .rowb{display:flex;gap:8px;flex-wrap:wrap}
 .adminbox input{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 10px;flex:1;min-width:150px}
 .linkbtn{padding:4px 0;border:0;background:none;color:var(--muted);text-decoration:underline;font-weight:500;font-size:13px}
+.brand-r{display:flex;align-items:center;gap:12px}
+.helpbtn{padding:5px 12px;font-size:13px;border-radius:999px}
+.help-back{position:fixed;inset:0;z-index:30;background:rgba(10,18,22,.55);display:flex;align-items:flex-start;justify-content:center;padding:calc(16px + env(safe-area-inset-top,0px)) 16px 16px;overflow-y:auto}
+.help{background:var(--panel);color:var(--ink);border-radius:14px;max-width:560px;width:100%;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.help-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.help h2{font-family:var(--display);text-transform:uppercase;font-size:22px;margin:0;letter-spacing:.03em}
+.steps{margin:14px 0 0;padding-left:0;list-style:none;counter-reset:st;display:grid;gap:12px}
+.steps li{counter-increment:st;position:relative;padding-left:40px;line-height:1.45;min-height:28px}
+.steps li::before{content:counter(st);position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-family:var(--display);font-weight:700}
+.t-ref{color:var(--ref)} .t-bar{color:var(--bar)} .t-bod{color:var(--bod)}
+.tips{margin-top:16px;padding:12px 14px;border-radius:10px;background:var(--panel-2);font-size:14px}
+.tips ul{margin:6px 0 0;padding-left:18px;display:grid;gap:4px}
+.okdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok)}
 @media (max-width:560px){
   .meta{grid-template-columns:1fr 1fr}
   .meta .newbtn{grid-column:1/-1;order:-1}
@@ -159,7 +172,7 @@ tr.sect td{font-family:var(--display);font-size:16px;text-transform:uppercase;le
   <header class="top">
     <div class="brand">
       <h1>La Resaca <span>Calexico</span> · Inventario</h1>
-      <div class="sync" id="sync"><i class="dot" id="syncDot"></i><span id="syncTxt">Conectando…</span></div>
+      <div class="brand-r"><button type="button" class="helpbtn" id="btnHelp" aria-controls="help">Pasos</button><div class="sync" id="sync"><i class="dot" id="syncDot"></i><span id="syncTxt">Conectando…</span></div></div>
     </div>
     <div class="meta">
       <button class="newbtn" id="btnNew" type="button">+ Nueva forma</button>
@@ -187,6 +200,29 @@ tr.sect td{font-family:var(--display);font-size:16px;text-transform:uppercase;le
 
   <div id="banner" class="banner" hidden></div>
   <main id="main"><div class="empty">Cargando inventario…</div></main>
+</div>
+
+<div class="help-back" id="help" hidden>
+ <div class="help" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+  <div class="help-head"><h2 id="helpTitle">Pasos para Toma de Inventario</h2><button type="button" id="btnHelpClose">Cerrar</button></div>
+  <ol class="steps">
+   <li><b>Crea la forma del día.</b> Toca <b>+ Nueva forma</b>, elige la <b>fecha</b> del conteo y toca <b>Crear inventario</b>. Si esa fecha ya existe, la app abre la que ya está.</li>
+   <li><b>Escribe tu nombre</b> en <b>Responsable</b>.</li>
+   <li><b>Empieza por <span class="t-ref">REFRI</span></b> (azul). En cada producto escribe <b>Cajas</b> y <b>Sueltas</b>; la app calcula el total sola (1 caja de botella = 24, 1 caja de caguama = 12). Deja en blanco lo que no haya.</li>
+   <li><b>Si el mismo producto está en varios lugares,</b> súmalo en la casilla: escribe <b>3+2+1</b> y se guarda 6. También puedes usar la <b>Calculadora</b> (abajo a la derecha): toca la casilla, haz la cuenta y toca <b>Poner en la casilla</b>.</li>
+   <li><b>Sigue con <span class="t-bar">BAR</span></b> (naranja, el refrigerador de atrás) y luego <b><span class="t-bod">BODEGA</span></b> (verde). El color te indica en qué área estás capturando.</li>
+   <li><b>Revisa en RESUMEN</b> los totales por producto y por área. Marca <b>Solo con conteo</b> en cada área para revisar rápido lo que capturaste.</li>
+   <li><b>Envía el inventario.</b> En Resumen toca <b>Enviar inventario</b> y luego <b>Sí, enviar</b>. Después de enviarlo ya <b>no se puede modificar</b>.</li>
+   <li><b>(Opcional)</b> Toca <b>Bajar a Excel</b> para descargar el conteo.</li>
+  </ol>
+  <div class="tips"><b>Bueno saber</b>
+   <ul>
+    <li>Todo se guarda solo. Arriba verás <span class="okdot"></span> <b>Guardado</b> / <b>Al día</b>.</li>
+    <li>Si aparece <b>Sin conexión</b>, no cierres la app hasta que vuelva a decir Guardado.</li>
+    <li>Varias personas pueden contar al mismo tiempo, cada una en un área distinta.</li>
+    <li>Si ya enviaste y hay un error, avisa a Jose (admin) para que lo reabra.</li>
+   </ul></div>
+ </div>
 </div>
 <button class="calc-fab" id="calcFab" type="button" aria-expanded="false" aria-controls="calc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 19h.01M12 19h.01M16 19h.01"/></svg>Calculadora</button>
 <div class="calc" id="calc" hidden>
@@ -476,6 +512,10 @@ function cEval(e){if(!/^[\d.+\-*/]+$/.test(e))return null;e=e.replace(/[+\-*/.]+
 function cShow(){const pretty=cExpr.replace(/\*/g,"×").replace(/\//g,"÷").replace(/-/g,"−");$("#calcExpr").textContent=pretty;const v=cEval(cExpr);$("#calcRes").textContent=v===null?"Error":v;
   const ok=!isLocked()&&lastInput&&document.body.contains(lastInput)&&!lastInput.disabled&&v!==null&&v>=0;$("#calcUse").disabled=!ok;
   $("#calcHint").textContent=lastInput&&document.body.contains(lastInput)?`Casilla: ${lastInput.getAttribute("aria-label")}`:"Toca una casilla de Cajas o Sueltas y luego “Poner en la casilla”."}
+$("#btnHelp").addEventListener("click",()=>{$("#help").hidden=false;$("#btnHelpClose").focus()});
+$("#btnHelpClose").addEventListener("click",()=>{$("#help").hidden=true});
+$("#help").addEventListener("click",e=>{if(e.target.id==="help")$("#help").hidden=true});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")$("#help").hidden=true});
 $("#calcFab").addEventListener("click",()=>{const c=$("#calc");c.hidden=!c.hidden;$("#calcFab").setAttribute("aria-expanded",String(!c.hidden));cShow()});
 $("#calcClose").addEventListener("click",()=>{$("#calc").hidden=true;$("#calcFab").setAttribute("aria-expanded","false")});
 $("#calcKeys").addEventListener("click",e=>{const k=e.target.closest("button")?.dataset.k;if(!k)return;
