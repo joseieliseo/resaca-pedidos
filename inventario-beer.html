@@ -21,6 +21,7 @@ body{margin:0}
   --shadow:0 1px 2px rgba(19,34,43,.06),0 4px 14px rgba(19,34,43,.06);
   --ref:#1C6FB5; --ref-soft:#DDEBF7; --bar:#B8651A; --bar-soft:#F6E7D6; --bod:#3C7A3A; --bod-soft:#E0EEDC;
   --loc:var(--ink); --loc-soft:var(--panel-2);
+  --new:#5B47B0; --help-bg:#F4C84A; --help-ink:#2A2108;
   --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
   --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
@@ -30,6 +31,7 @@ body{margin:0}
     --bg:#0D161B; --panel:#15222A; --panel-2:#1A2932; --ink:#E4ECEE; --muted:#93A6AE; --line:#2A3C46;
     --accent:#E0913F; --accent-ink:#1A0F05; --accent-soft:#3A2814;
     --teal:#6FB8C0; --teal-soft:#16343A; --ok:#6CC08F; --warn:#E48A62;
+    --new:#8F7BEA; --help-bg:#E8BD3F; --help-ink:#1E1805;
     --ref:#6AAEE8; --ref-soft:#152C40; --bar:#E0913F; --bar-soft:#3A2814; --bod:#86C781; --bod-soft:#1C3320;
     --shadow:0 1px 2px rgba(0,0,0,.3);
   }
@@ -55,7 +57,9 @@ h1 span{color:var(--muted)}
 .btns{display:flex;gap:8px}
 .btns button{white-space:nowrap}
 .newbtn,.xlsbtn{white-space:nowrap}
-.meta{display:grid;grid-template-columns:auto 1fr 1fr auto;gap:10px;margin-top:12px;align-items:end}
+#btnNew{background:var(--new);border-color:var(--new);color:#fff}
+.helpbtn{background:var(--help-bg)!important;border-color:var(--help-bg)!important;color:var(--help-ink)!important;font-weight:700}
+.meta{display:grid;grid-template-columns:auto 1fr 1fr;gap:10px;margin-top:12px;align-items:end}
 .field{display:flex;flex-direction:column;gap:4px;min-width:0}
 .field label{font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
 select,input[type=text],input[type=date]{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:9px 10px;min-width:0;width:100%}
@@ -156,10 +160,11 @@ tr.sect td{font-family:var(--display);font-size:16px;text-transform:uppercase;le
 .tips{margin-top:16px;padding:12px 14px;border-radius:10px;background:var(--panel-2);font-size:14px}
 .tips ul{margin:6px 0 0;padding-left:18px;display:grid;gap:4px}
 .okdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok)}
+.endx{margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}
+.endx button{flex:1;min-width:200px;padding:12px 14px}
 @media (max-width:560px){
   .meta{grid-template-columns:1fr 1fr}
   .meta .newbtn{grid-column:1/-1;order:-1}
-  .meta .xlsbtn{grid-column:1/-1}
   .btns button{flex:1}
   .cols,.row{grid-template-columns:minmax(0,1fr) 64px 64px 48px;gap:6px}
   .tab{font-size:15px}
@@ -172,13 +177,12 @@ tr.sect td{font-family:var(--display);font-size:16px;text-transform:uppercase;le
   <header class="top">
     <div class="brand">
       <h1>La Resaca <span>Calexico</span> · Inventario</h1>
-      <div class="brand-r"><button type="button" class="helpbtn" id="btnHelp" aria-controls="help">Pasos</button><div class="sync" id="sync"><i class="dot" id="syncDot"></i><span id="syncTxt">Conectando…</span></div></div>
+      <div class="brand-r"><button type="button" class="helpbtn" id="btnHelp" aria-controls="help">📋 Pasos</button><div class="sync" id="sync"><i class="dot" id="syncDot"></i><span id="syncTxt">Conectando…</span></div></div>
     </div>
     <div class="meta">
       <button class="newbtn" id="btnNew" type="button">+ Nueva forma</button>
       <div class="field"><label for="selInv">Fecha del inventario</label><select id="selInv"></select></div>
       <div class="field"><label for="inpResp">Responsable</label><input type="text" id="inpResp" placeholder="Nombre" autocomplete="off"></div>
-      <button class="primary xlsbtn" id="btnXlsxTop" type="button">Bajar a Excel</button>
     </div>
     <div class="dialog" id="newDlg" hidden>
       <div class="rowb">
@@ -213,7 +217,7 @@ tr.sect td{font-family:var(--display);font-size:16px;text-transform:uppercase;le
    <li><b>Sigue con <span class="t-bar">BAR</span></b> (naranja, el refrigerador de atrás) y luego <b><span class="t-bod">BODEGA</span></b> (verde). El color te indica en qué área estás capturando.</li>
    <li><b>Revisa en RESUMEN</b> los totales por producto y por área. Marca <b>Solo con conteo</b> en cada área para revisar rápido lo que capturaste.</li>
    <li><b>Envía el inventario.</b> En Resumen toca <b>Enviar inventario</b> y luego <b>Sí, enviar</b>. Después de enviarlo ya <b>no se puede modificar</b>.</li>
-   <li><b>(Opcional)</b> Toca <b>Bajar a Excel</b> para descargar el conteo.</li>
+   <li><b>(Opcional)</b> Toca <b>Bajar a Excel</b>, al final de la forma, para descargar el conteo.</li>
   </ol>
   <div class="tips"><b>Bueno saber</b>
    <ul>
@@ -299,7 +303,8 @@ function render(){
     }
     h+=`</section>`;
   }
-  h+=`<p class="note">Los cambios se guardan solos y los ven todos al instante. Puedes sumar directo en la casilla: escribe 3+1+5 y se guarda 9. También tienes la calculadora abajo a la derecha.</p>`;
+  h+=`<p class="note">Los cambios se guardan solos y los ven todos al instante. Puedes sumar directo en la casilla: escribe 3+1+5 y se guarda 9. También tienes la calculadora abajo a la derecha.</p>
+  <div class="actions endx"><button class="primary xlsbtn" id="btnXlsxTop" type="button">Bajar a Excel</button></div>`;
   main.innerHTML=h;
 }
 
@@ -323,7 +328,6 @@ function renderSummary(main){
     h+=`<tr class="sub"><td>Total ${label.toLowerCase()}</td>${s.map(x=>`<td>${x}</td>`).join("")}<td>${s[0]+s[1]+s[2]}</td></tr>`;
   }
   h+=`</tbody></table></div>
-  <div class="actions"><button class="primary" id="btnXlsx" type="button">Descargar Excel</button></div>
   ${isLocked()?"":`<div class="sendbox" id="sendBox">
     <div><b>¿Terminaste el conteo?</b><br><span class="note" style="margin:0">Revisa el resumen. Al enviarlo se cierra y nadie podrá cambiarlo.</span></div>
     <button class="primary" type="button" id="btnSend" ${sendOpen?"hidden":""}>Enviar inventario</button>
@@ -339,7 +343,8 @@ function renderSummary(main){
   <div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Responsable</th><th>Botellas</th><th>Caguamas</th><th style="text-align:left">Estado</th><th></th></tr></thead><tbody>
   ${invList.map(i=>`<tr${i.id===curId?' style="background:var(--accent-soft)"':''}><td>${fmtDate(i.fecha)}</td><td style="text-align:left">${esc(i.data.responsable||"—")}</td><td>${docTot(i.data,"botella")}</td><td>${docTot(i.data,"caguama")}</td><td style="text-align:left">${i.data.estado==="enviado"?"Enviado":"Abierto"}</td><td>${i.id===curId?"Abierto":`<button type="button" data-open="${i.id}">Abrir</button>`}</td></tr>`).join("")}
   </tbody></table></div>
-  <div class="actions"><button id="btnXlsxAll" type="button">Descargar historial completo (Excel)</button></div></section>`;
+  </section>
+  <div class="actions endx"><button class="primary xlsbtn" id="btnXlsx" type="button">Bajar a Excel</button><button id="btnXlsxAll" type="button">Bajar historial completo (Excel)</button></div>`;
   main.innerHTML=h;
 }
 
